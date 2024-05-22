@@ -26,7 +26,7 @@ export default async function analyzeTask(
   const serverVersion = tl.getVariable(TaskVariables.SonarQubeServerVersion);
   JavaVersionResolver.setJavaVersion(
     jdkVersionSource,
-    isSonarCloud ? EndpointType.SonarCloud : EndpointType.SonarQube,
+    isSonarCloud ? EndpointType.CodeScanCloud : EndpointType.SonarQube,
     serverVersion,
   );
 

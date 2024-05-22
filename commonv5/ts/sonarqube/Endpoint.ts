@@ -9,7 +9,7 @@ import { getProxyFromURI } from "../helpers/proxyFromEnv";
 const REQUEST_TIMEOUT = 60000;
 
 export enum EndpointType {
-  SonarCloud = "SonarCloud",
+  CodeScanCloud = "CodeScanCloud",
   SonarQube = "SonarQube",
 }
 
@@ -107,11 +107,11 @@ export default class Endpoint {
     const token = tl.getEndpointAuthorizationParameter(
       id,
       "apitoken",
-      type !== EndpointType.SonarCloud,
+      type !== EndpointType.CodeScanCloud,
     );
     const username = tl.getEndpointAuthorizationParameter(id, "username", true);
     const password = tl.getEndpointAuthorizationParameter(id, "password", true);
-    const organization = tl.getInput("organization", type === EndpointType.SonarCloud);
+    const organization = tl.getInput("organization", type === EndpointType.CodeScanCloud);
     return new Endpoint(type, { url, token, username, password, organization });
   }
 }

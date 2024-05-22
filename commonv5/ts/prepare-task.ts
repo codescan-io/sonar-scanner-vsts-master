@@ -9,7 +9,8 @@ import {
 } from "./helpers/constants";
 import { getServerVersion } from "./helpers/request";
 import { stringifyScannerParams } from "./helpers/utils";
-import Endpoint, { EndpointType } from "./sonarqube/Endpoint";
+import Endpoint from './sonarqube/Endpoint';
+import { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 import TaskReport from "./sonarqube/TaskReport";
 
@@ -20,7 +21,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 
   let props: { [key: string]: string } = {};
 
-  if (branchFeatureSupported(endpoint, serverVersion)) {
     await populateBranchAndPrProps(props);
     /* branchFeatureSupported method magically checks everything we need for the support of the below property, 
     so we keep it like that for now, waiting for a hardening that will refactor this (at least by renaming the method name) */
@@ -29,7 +29,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     );
     props["sonar.scanner.metadataFilePath"] = TaskReport.getDefaultPath();
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
-  }
 
   props = {
     ...props,
@@ -64,7 +63,7 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
 }
 
 export function branchFeatureSupported(endpoint, serverVersion: string | semver.SemVer) {
-  if (endpoint.type === EndpointType.SonarCloud) {
+  if (endpoint.type === EndpointType.CodeScanCloud) {
     return true;
   }
   return semver.satisfies(serverVersion, ">=7.2.0");

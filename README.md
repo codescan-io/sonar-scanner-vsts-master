@@ -8,8 +8,7 @@ Sonar's [Clean Code solutions](https://www.sonarsource.com/solutions/clean-code/
 Marketplace
 -----------
 
-https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarqube
-https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
+https://marketplace.visualstudio.com/items?itemName=codescansf.sonarqube
 
 Have Questions or Feedback?
 ---------------------------

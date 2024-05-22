@@ -1,0 +1,72 @@
+{
+  "id": "codescancloud_salesforce_template",
+  "name": "Salesforce with CodeScanCloud",
+  "category": "Build",
+  "iconTaskId": "6d6bf390-8504-42e2-bfcf-9be00dd89226",
+  "defaultHostedQueue": null,
+  "description": "Analyze your Salesforce projects and analyze with CodeScanCloud.",
+  "template": {
+    "build": [
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "task": {
+          "id": "674f161f-1733-4238-a8f8-2b37fe5f02c1",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {
+          "scannerMode": "CLI",
+          "configMode": "manual",
+          "extraProperties": "# Additional properties that will be passed to the scanner, \n# Put one key=value per line, example:\n# sonar.exclusions=**/*.bin\n\n#salesforce.username=\n#salesforce.password=\n#salesforce.url=https://login.salesforce.com"
+        }
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "condition": "succeeded()",
+        "task": {
+          "id": "6d6bf390-8504-42e2-bfcf-9be00dd89226",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      },
+      {
+        "environment": {},
+        "enabled": true,
+        "continueOnError": false,
+        "alwaysRun": false,
+        "timeoutInMinutes": 0,
+        "condition": "succeeded()",
+        "task": {
+          "id": "65751afb-5038-48f6-ae57-342a3a210165",
+          "versionSpec": "1.*",
+          "definitionType": "task"
+        },
+        "inputs": {}
+      }
+    ],
+    "options": [
+      {
+        "enabled": true,
+        "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
+        "inputs": {}
+      }
+    ],
+    "variables": {
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      }
+    },
+    "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
+    "jobAuthorizationScope": "projectCollection"
+  }
+}

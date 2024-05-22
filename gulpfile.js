@@ -370,25 +370,12 @@ gulp.task("scanner:download", () => {
 gulp.task("scanner:extract-scanners", () => {
   // Extract Windows scanner for MSBuild
   const scannerFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "prepare", "old", "SonarQubeScannerMsBuild"),
     path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "classic-sonar-scanner-msbuild",
-    ),
+          paths.build.extensions.codescancloudTasks,
+          'prepare',
+          'new',
+          'classic-sonar-scanner-msbuild'
+        )
   ];
   let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
   scannerFolders.forEach((dir) => {
@@ -398,23 +385,11 @@ gulp.task("scanner:extract-scanners", () => {
   // Extract dotnet for MSBuild
   const dotnetScannerFolders = [
     path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "dotnet-sonar-scanner-msbuild",
-    ),
+          paths.build.extensions.codescancloudTasks,
+          'prepare',
+          'new',
+          'dotnet-sonar-scanner-msbuild'
+        )
   ];
   let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
   dotnetScannerFolders.forEach((dir) => {
@@ -423,14 +398,11 @@ gulp.task("scanner:extract-scanners", () => {
 
   // Extract CLI scanner to 'analyze' tasks
   const cliFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "scanner-cli", "old", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v4", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v5", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarcloudTasks, "analyze", "v1", "sonar-scanner"),
+    path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
   ];
   let cliPipe = gulp.src(
-    pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`),
-  );
+      pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
+    );
   cliFolders.forEach((dir) => {
     cliPipe = cliPipe.pipe(gulp.dest(dir));
   });
