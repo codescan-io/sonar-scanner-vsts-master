@@ -1,6 +1,6 @@
-import * as tl from "azure-pipelines-task-lib/task";
-import { get } from "../helpers/request";
-import Endpoint from "./Endpoint";
+import * as tl from 'vsts-task-lib/task';
+import Endpoint from './Endpoint';
+import { getJSON } from '../helpers/request';
 
 interface IMetric {
   custom?: boolean;
@@ -26,11 +26,11 @@ export default class Metrics {
   constructor(public metrics: IMetric[]) {}
 
   public getMetricByKey(key: string) {
-    return this.metrics.find((metric) => metric.key === key);
+    return this.metrics.find(metric => metric.key === key);
   }
 
   public static getAllMetrics(endpoint: Endpoint): Promise<Metrics | undefined> {
-    return inner().catch((err) => {
+    return inner().catch(err => {
       tl.error(`[SQ] Could not fetch metrics`);
       if (err && err.message) {
         tl.error(err.message);
@@ -41,10 +41,10 @@ export default class Metrics {
     });
 
     function inner(
-      data: { f?: string; p?: number; ps?: number } = { f: "name", ps: 500 },
-      prev?: MetricsResponse,
+      data: { f?: string; p?: number; ps?: number } = { f: 'name', ps: 500 },
+      prev?: MetricsResponse
     ): Promise<Metrics> {
-      return get(endpoint, "/api/metrics/search", true, data).then((r: MetricsResponse) => {
+      return getJSON(endpoint, '/api/metrics/search', data).then((r: MetricsResponse) => {
         const result = prev ? prev.metrics.concat(r.metrics) : r.metrics;
         if (r.p * r.ps >= r.total) {
           return new Metrics(result);

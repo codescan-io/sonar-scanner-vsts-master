@@ -1,6 +1,6 @@
 sonar-scanner-vsts
-Copyright (C) 2017-2020 SonarSource SA
+Copyright (C) 2017-2018 SonarSource SA
 mailto:info AT sonarsource DOT com
 
 This product includes software developed at
-SonarSource (http://www.sonarsource.com/).
+VillageChief (http://www.code-scan.com/) and SonarSource (http://www.sonarsource.com/).

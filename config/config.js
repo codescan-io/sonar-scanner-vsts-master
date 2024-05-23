@@ -1,13 +1,13 @@
-const msBuildVersion = "5.15.1.88158";
-const cliVersion = "4.8.1.3023"; // Has to be the same version as the one embedded in the Scanner for MSBuild
+const msBuildVersion = '4.6.2.2108';
+const cliVersion = '3.3.0.1492'; // Has to be the same version as the one embedded in the Scanner for MSBuild
 
-const scannersLocation = `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${msBuildVersion}/`;
-const classicScannerFilename = `sonar-scanner-msbuild-${msBuildVersion}-net46.zip`;
-const dotnetScannerFilename = `sonar-scanner-msbuild-${msBuildVersion}-netcoreapp3.0.zip`;
+const scannerUrlCommon =
+  `https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/${msBuildVersion}/` +
+  `sonar-scanner-msbuild-${msBuildVersion}`;
 
 exports.scanner = {
   msBuildVersion,
   cliVersion,
-  classicUrl: scannersLocation + classicScannerFilename,
-  dotnetUrl: scannersLocation + dotnetScannerFilename,
+  classicUrl: `${scannerUrlCommon}-net46.zip`,
+  dotnetUrl: `${scannerUrlCommon}-netcoreapp2.0.zip`
 };

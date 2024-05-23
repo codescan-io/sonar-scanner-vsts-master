@@ -1,0 +1,13 @@
+{
+  "name": "publish",
+  "version": "4.0.0",
+  "description": "CodeScanCloud Task Publish",
+  "author": "VillageChief",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "vsts-task-lib": "2.4.0"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "analyze",
+  "version": "1.0.0",
+  "description": "CodeScan Cloud Task Analyze",
+  "author": "VillageChief",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "vsts-task-lib": "2.4.0"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}

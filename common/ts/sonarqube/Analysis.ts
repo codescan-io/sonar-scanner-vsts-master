@@ -1,8 +1,8 @@
-import * as tl from "azure-pipelines-task-lib/task";
-import { formatMeasure } from "../helpers/measures";
-import { get } from "../helpers/request";
-import Endpoint, { EndpointType } from "./Endpoint";
-import Metrics from "./Metrics";
+import * as tl from 'vsts-task-lib/task';
+import Endpoint, { EndpointType } from './Endpoint';
+import Metrics from './Metrics';
+import { formatMeasure } from '../helpers/measures';
+import { getJSON } from '../helpers/request';
 
 interface IAnalysis {
   status: string;
@@ -23,10 +23,9 @@ export default class Analysis {
   constructor(
     private readonly analysis: IAnalysis,
     private readonly endpointType: EndpointType,
-    private readonly warnings: string[],
     private readonly dashboardUrl?: string,
     private readonly metrics?: Metrics,
-    private readonly projectName?: string,
+    private readonly projectName?: string
   ) {}
 
   public get status() {
@@ -38,8 +37,8 @@ export default class Analysis {
   }
 
   public getFailedConditions() {
-    return this.conditions.filter((condition) =>
-      ["WARN", "ERROR"].includes(condition.status.toUpperCase()),
+    return this.conditions.filter(condition =>
+      ['WARN', 'ERROR'].includes(condition.status.toUpperCase())
     );
   }
 
@@ -48,10 +47,9 @@ export default class Analysis {
     return [
       this.getQualityGateSection(),
       this.getQualityGateDetailSection(),
-      this.getDashboardLink(),
-      this.getWarnings(),
+      this.getDashboardLink()
     ]
-      .join(" \r\n")
+      .join(' \r\n')
       .trim();
   }
 
@@ -65,42 +63,41 @@ export default class Analysis {
       font-size: 12px;
       margin-left: 15px;`;
     return `<div style="padding-top: 8px;">
-      <span>${this.projectName ? this.projectName + " " : ""}Quality Gate</span>
+      <span>${this.projectName ? this.projectName + ' ' : ''}Quality Gate</span>
       <span style="${qgStyle}">
-        ${formatMeasure(this.status, "LEVEL")}
+        ${formatMeasure(this.status, 'LEVEL')}
       </span>
     </div>`;
   }
 
   private getQualityGateDetailSection() {
     const failedConditions = this.getFailedConditions();
-    if (!this.metrics || !["WARN", "ERROR"].includes(this.status) || failedConditions.length <= 0) {
-      return "";
+    if (!this.metrics || !['WARN', 'ERROR'].includes(this.status) || failedConditions.length <= 0) {
+      return '';
     }
 
-    const rows = failedConditions.map((condition) => {
+    const rows = failedConditions.map(condition => {
       const metric = this.metrics && this.metrics.getMetricByKey(condition.metricKey);
       if (!metric) {
         return null;
       }
 
       const threshold =
-        condition.status === "WARN" ? condition.warningThreshold : condition.errorThreshold;
+        condition.status === 'WARN' ? condition.warningThreshold : condition.errorThreshold;
       return `<tr>
         <td><span style="padding-right:4px;">${metric.name}</span></td>
         <td style="text-align:center; color:#fff; background-color:${this.getQualityGateColor()};">
           <span style="padding:0px 4px; line-height:20px;">${formatMeasure(
             condition.actualValue,
-            metric.type,
+            metric.type
           )}</span>
         </td>
         <td>
-          <span style="padding-left:4px">${formatMeasure(condition.comparator, "COMPARATOR")}</span>
+          <span style="padding-left:4px">${formatMeasure(condition.comparator, 'COMPARATOR')}</span>
           <span style="padding-left:4px">${formatMeasure(threshold, metric.type)}</span>
         </td>
       </tr>`;
     });
-
     const tableStyle = `
       margin-top: 8px;
       border-top: 1px solid #eee;
@@ -109,41 +106,31 @@ export default class Analysis {
     `;
     return `<table border="0" style="${tableStyle}">
       <tbody>
-        ${rows.join(" \r\n").trim()}
+        ${rows.join(' \r\n').trim()}
       </tbody>
     </table>\r\n\r\n`; // 2 carriage returns to prevent any malformed summary results
   }
 
   private getDashboardLink() {
     if (!this.dashboardUrl) {
-      return "";
+      return '';
     }
     const linkText = `Detailed ${this.endpointType} report &gt;`;
     return `[${linkText}](${this.dashboardUrl})`;
   }
 
-  public getWarnings() {
-    if (this.warnings.some((w) => w.includes("Please update to at least Java 11"))) {
-      return `<br><span>&#9888;</span><b>${this.warnings.find((w) =>
-        w.includes("Please update to at least Java 11"),
-      )}</b>`;
-    } else {
-      return "";
-    }
-  }
-
   private getQualityGateColor() {
     switch (this.status) {
-      case "OK":
-        return "#00aa00";
-      case "WARN":
-        return "#ed7d20";
-      case "ERROR":
-        return "#d4333f";
-      case "NONE":
-        return "#b4b4b4";
+      case 'OK':
+        return '#00aa00';
+      case 'WARN':
+        return '#ed7d20';
+      case 'ERROR':
+        return '#d4333f';
+      case 'NONE':
+        return '#b4b4b4';
       default:
-        return "#b4b4b4";
+        return '#b4b4b4';
     }
   }
 
@@ -152,28 +139,26 @@ export default class Analysis {
     projectName,
     endpoint,
     metrics,
-    dashboardUrl,
-    warnings,
+    dashboardUrl
   }: {
     analysisId: string;
     dashboardUrl?: string;
     endpoint: Endpoint;
     projectName?: string;
     metrics?: Metrics;
-    warnings: string[];
   }): Promise<Analysis> {
     tl.debug(`[SQ] Retrieve Analysis id '${analysisId}.'`);
-    return get(endpoint, "/api/qualitygates/project_status", true, { analysisId }).then(
+    return getJSON(endpoint, '/api/qualitygates/project_status', { analysisId }).then(
       ({ projectStatus }: { projectStatus: IAnalysis }) =>
-        new Analysis(projectStatus, endpoint.type, warnings, dashboardUrl, metrics, projectName),
-      (err) => {
+        new Analysis(projectStatus, endpoint.type, dashboardUrl, metrics, projectName),
+      err => {
         if (err && err.message) {
           tl.error(`[SQ] Error retrieving analysis: ${err.message}`);
         } else if (err) {
           tl.error(`[SQ] Error retrieving analysis: ${JSON.stringify(err)}`);
         }
         throw new Error(`[SQ] Could not fetch analysis for ID '${analysisId}'`);
-      },
+      }
     );
   }
 }

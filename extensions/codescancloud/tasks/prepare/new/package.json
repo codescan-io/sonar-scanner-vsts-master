@@ -1,0 +1,13 @@
+{
+  "name": "prepare",
+  "version": "4.0.0",
+  "description": "CodeScan Cloud Task Prepare",
+  "author": "Village Chief",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "vsts-task-lib": "2.4.0"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}

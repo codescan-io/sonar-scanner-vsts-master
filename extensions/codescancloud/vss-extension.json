@@ -1,0 +1,159 @@
+{
+  "manifestVersion": 1,
+  "id": "codescan",
+  "name": "CodeScan Cloud",
+  "version": "1.6.8",
+  "branding": {
+    "color": "rgb(243, 243, 243)",
+    "theme": "light"
+  },
+  "publisher": "codescansf",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services.Cloud"
+    }
+  ],
+  "description":
+    "Use the CodeScan build tasks in your build/release definitions to track bugs, code smells and vulnerabilities in Salesforce languages like Apex, VisualForce, Lightning, etc",
+  "public": true,
+  "categories": ["Build and release"],
+  "icons": {
+    "default": "extension-icon.png"
+  },
+  "tags": ["build", "ci", "continuous integration", "code quality", "static code analysis"],
+  "content": {
+    "details": {
+      "path": "overview.md"
+    },
+    "license": {
+      "path": "license-terms.md"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "img/tasks.png"
+    }
+  ],
+  "links": {
+    "home": {
+      "uri": "https://www.code-scan.com/cloud/"
+    },
+    "getstarted": {
+      "uri": "https://www.code-scan.com/cloud/install-configure-scanner-tfs-ts"
+    },
+    "support": {
+      "uri": "https://www.code-scan.com/help/support/"
+    }
+  },
+  "CustomerQnASupport": {
+    "enableqna": "true",
+    "url": "https://www.code-scan.com/contact/"
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/VillageChief/sonar-scanner-vsts"
+  },
+  "baseUri": "https://app.codescan.io",
+  "files": [
+    {
+      "path": "tasks"
+    },
+    {
+      "path": "img",
+      "addressable": true
+    },
+    {
+      "path": "icons",
+      "addressable": true
+    },
+    {
+      "path": "templates"
+    }
+  ],
+  "scopes": ["vso.build", "vso.code", "vso.test"],
+  "contributions": [
+    {
+      "id": "674f161f-1733-4238-a8f8-2b37fe5f02c1",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/prepare"
+      }
+    },
+    {
+      "id": "6d6bf390-8504-42e2-bfcf-9be00dd89226",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/analyze"
+      }
+    },
+    {
+      "id": "65751afb-5038-48f6-ae57-342a3a210165",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "tasks/publish"
+      }
+    },
+    {
+      "id": "6cf9c451-5b60-4eb6-a1b2-265f6a507b22",
+      "description": "Service endpoint type for CodeScanCloud Connections",
+      "type": "ms.vss-endpoint.service-endpoint-type",
+      "targets": ["ms.vss-endpoint.endpoint-types"],
+      "properties": {
+        "name": "codescancloud",
+        "displayName": "CodeScanCloud",
+        "icon": "icons/CodeScanCloud_endpoint.png",
+        "url": {
+          "displayName": "Server Url",
+          "value": "https://app.codescan.io",
+          "isVisible": false
+        },
+        "dataSources": [
+          {
+            "name": "TestConnection",
+            "endpointUrl": "{{endpoint.url}}api/organizations/search?member=true",
+            "resultSelector": "jsonpath:$.organizations[*]"
+          }
+        ],
+        "authenticationSchemes": [
+          {
+            "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Basic {{ #base64 endpoint.apitoken \":\" }}"
+              }
+            ],
+            "inputDescriptors": [
+              {
+                "id": "apitoken",
+                "name": "CodeScanCloud Token",
+                "description": "Authentication Token generated through CodeScanCloud (go to My Account > Security > Generate Tokens)",
+                "inputMode": "passwordbox",
+                "isConfidential": true,
+                "validation": {
+                  "isRequired": true,
+                  "dataType": "string"
+                }
+              }
+            ]
+          }
+        ],
+        "helpMarkDown":
+          "Go to <a href=\"https://app.codescan.io/account/security/\" target=\"_blank\">your CodeScan Cloud account security page</a> to generate a token."
+      }
+    },
+    {
+      "id": "b8c99f95-9530-4f0b-b75f-32a9c7e196bb",
+      "type": "ms.vss-build.template",
+      "targets": [
+        "ms.vss-build.templates"
+      ],
+      "properties": {
+        "name": "templates/salesforce"
+      }
+    }
+  ]
+}

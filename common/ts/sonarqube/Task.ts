@@ -1,6 +1,6 @@
-import * as tl from "azure-pipelines-task-lib/task";
-import { get } from "../helpers/request";
-import Endpoint, { EndpointType } from "./Endpoint";
+import * as tl from 'vsts-task-lib/task';
+import Endpoint from './Endpoint';
+import { getJSON } from '../helpers/request';
 
 interface ITask {
   analysisId: string;
@@ -10,7 +10,6 @@ interface ITask {
   errorMessage?: string;
   type: string;
   componentName: string;
-  warnings: string[];
 }
 
 export default class Task {
@@ -24,39 +23,25 @@ export default class Task {
     return this.task.componentName;
   }
 
-  public get warnings() {
-    if (this.task.warnings) {
-      return this.task.warnings;
-    } else {
-      return [];
-    }
-  }
-
   public static waitForTaskCompletion(
     endpoint: Endpoint,
     taskId: string,
     tries: number,
-    delay = 1000,
+    delay = 1000
   ): Promise<Task> {
     tl.debug(`[SQ] Waiting for task '${taskId}' to complete.`);
-    let query = {};
-    if (endpoint.type === EndpointType.SonarQube) {
-      query = { id: taskId };
-    } else {
-      query = { id: taskId, additionalFields: "warnings" };
-    }
-    return get(endpoint, `/api/ce/task`, true, query).then(
+    return getJSON(endpoint, `/api/ce/task`, { id: taskId }).then(
       ({ task }: { task: ITask }) => {
         tl.debug(`[SQ] Task status:` + task.status);
         if (tries <= 0) {
           throw new TimeOutReachedError();
         }
-        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : "";
+        const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : '';
         switch (task.status.toUpperCase()) {
-          case "CANCELED":
-          case "FAILED":
+          case 'CANCEL':
+          case 'FAILED':
             throw new Error(`[SQ] Task failed with status ${task.status}${errorInfo}`);
-          case "SUCCESS":
+          case 'SUCCESS':
             tl.debug(`[SQ] Task complete: ${JSON.stringify(task)}`);
             return new Task(task);
           default:
@@ -64,18 +49,18 @@ export default class Task {
               setTimeout(() => {
                 Task.waitForTaskCompletion(endpoint, taskId, tries, delay).then(resolve, reject);
                 tries--;
-              }, delay),
+              }, delay)
             );
         }
       },
-      (err) => {
+      err => {
         if (err && err.message) {
           tl.error(err.message);
         } else if (err) {
           tl.error(JSON.stringify(err));
         }
         throw new Error(`[SQ] Could not fetch task for ID '${taskId}'`);
-      },
+      }
     );
   }
 }
