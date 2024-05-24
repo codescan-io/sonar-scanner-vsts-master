@@ -443,7 +443,7 @@ gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
     .forEach((extension) =>
-      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "foo")),
+      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
   done();
 });

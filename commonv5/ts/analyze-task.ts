@@ -12,7 +12,7 @@ import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 export default async function analyzeTask(
   rootPath: string,
   jdkVersionSource: JdkVersionSource,
-  isSonarCloud: boolean = false,
+  isSonarCloud: boolean = true,
 ) {
   if (typeof tl.getVariable(TaskVariables.SonarQubeScannerMode) === "undefined") {
     tl.setResult(
@@ -26,7 +26,7 @@ export default async function analyzeTask(
   const serverVersion = tl.getVariable(TaskVariables.SonarQubeServerVersion);
   JavaVersionResolver.setJavaVersion(
     jdkVersionSource,
-    isSonarCloud ? EndpointType.CodeScanCloud : EndpointType.SonarQube,
+    EndpointType.CodeScanCloud,
     serverVersion,
   );
 

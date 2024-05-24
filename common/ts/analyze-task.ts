@@ -10,7 +10,7 @@ const JAVA_11_PATH_ENV_NAME = "JAVA_HOME_11_X64";
 export default async function analyzeTask(
   rootPath: string,
   _jdkVersionSource: string = "",
-  isSonarCloud: boolean = false,
+  isSonarCloud: boolean = true,
 ) {
   const scannerMode: ScannerMode = ScannerMode[tl.getVariable("SONARQUBE_SCANNER_MODE")];
   if (!scannerMode) {
