@@ -45,13 +45,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   await scanner.runPrepare();
 }
 
-/* async function branchFeatureSupported(endpoint) {
-  if (endpoint.type === EndpointType.SonarCloud) {
-    return true;
-  }
-  const serverVersion = await getServerVersion(endpoint);
-  return serverVersion >= semver.parse("7.2.0");
-} */
 
 export async function populateBranchAndPrProps(props: { [key: string]: string }) {
   const collectionUrl = tl.getVariable("System.TeamFoundationCollectionUri");
