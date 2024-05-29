@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "codescan",
   "name": "CodeScan Cloud",
-  "version": "2.0.16",
+  "version": "2.0.20",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -124,16 +124,6 @@
       }
     },
     {
-      "id": "e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd",
-      "type": "ms.vss-dashboards-web.widget-configuration",
-      "targets": ["ms.vss-dashboards-web.widget-configuration"],
-      "properties": {
-        "name": "Code Quality Configuration",
-        "description": "Configures Code Quality Widget",
-        "uri": "/integration/vsts/index.html?type=configuration&contribution=e56c6ff0-c6f9-43d0-bdef-b3f1aa0dc6dd"
-      }
-    },
-    {
       "id": "6cf9c451-5b60-4eb6-a1b2-265f6a507b22",
       "description": "Service endpoint type for CodeScanCloud Connections",
       "type": "ms.vss-endpoint.service-endpoint-type",
@@ -142,18 +132,6 @@
         "name": "codescancloud",
         "displayName": "CodeScanCloud",
         "icon": "icons/CodeScanCloud_endpoint.png",
-        "url": {
-          "displayName": "Server Url",
-          "value": "https://app.codescan.io",
-          "isVisible": false
-        },
-        "dataSources": [
-          {
-            "name": "TestConnection",
-            "endpointUrl": "{{endpoint.url}}api/organizations/search?member=true",
-            "resultSelector": "jsonpath:$.organizations[*]"
-          }
-        ],
         "authenticationSchemes": [
           {
             "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
@@ -178,8 +156,15 @@
             ]
           }
         ],
+        "dataSources": [
+          {
+            "name": "TestConnection",
+            "endpointUrl": "{{endpoint.serverUrl}}api/organizations/search?member=true",
+            "resultSelector": "jsonpath:$.organizations[*]"
+          }
+        ],
         "helpMarkDown":
-        "Go to <a href=\"https://app.codescan.io/account/security/\" target=\"_blank\">your CodeScan Cloud account security page</a> to generate a token."
+        "Go to <a href=\"https://<serverUrl>/account/security/\" target=\"_blank\">your CodeScan Cloud account security page</a> to generate a token."
       }
     },
     {
