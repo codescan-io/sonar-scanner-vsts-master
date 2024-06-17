@@ -59,11 +59,7 @@ stages:
 
             . (Join-Path "azp" "helpers.ps1")
 
-            $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarqube/vss-extension.json"
-
-            Replace-Version $sqExtensionManifest
-
-            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/sonarcloud/vss-extension.json"
+            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/extensions/codescancloud/vss-extension.json"
 
             Replace-Version $scExtensionManifest
         pwsh: true
@@ -91,23 +87,12 @@ stages:
 
             . (Join-Path "azp" "helpers.ps1")
 
-            $sqExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarqube/vss-extension.json"
-
-            $version = Get-ExtensionVersion $sqExtensionManifest
-
-            Write-Host "Fetched ext version ${version} for SonarQube"
-
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarqube.vsix"
-
-            Write-Host "##vso[task.setvariable variable=SQ_EXT_NAME]$extensionNewName"
-            Write-Host "##vso[task.setvariable variable=SQ_VERSION;isOutput=true]$version"
-
-            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/sonarcloud/vss-extension.json"
+            $scExtensionManifest = "$env:BUILD_SOURCESDIRECTORY/build/extensions/codescancloud/vss-extension.json"
             $version = Get-ExtensionVersion $scExtensionManifest
 
-            Write-Host "Fetched ext version ${version} for SonarCloud"
+            Write-Host "Fetched ext version ${version} for codescancloud"
 
-            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-sonarcloud.vsix"
+            $extensionNewName = "$env:AGENT_BUILDDIRECTORY/a/sonar-scanner-vsts-${version}-codescancloud.vsix"
 
             Write-Host "##vso[task.setvariable variable=SC_EXT_NAME]$extensionNewName"
             Write-Host "##vso[task.setvariable variable=SC_VERSION;isOutput=true]$version"
@@ -134,13 +119,13 @@ stages:
       inputs:
         version: 'v0.10.x'
     - task: UnpublishAzureDevOpsExtension@3
-      displayName: 'Remove SonarCloud test extension from CI publisher'
+      displayName: 'Remove codescancloud test extension from CI publisher'
       inputs:
         connectTo: 'VsTeam'
         connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
         method: 'id'
         publisherId: '$(publisher)'
-        extensionId: 'sonarcloud'
+        extensionId: 'codescanf'
     - task: UnpublishAzureDevOpsExtension@3
       displayName: 'Remove SonarQube test extension from CI publisher'
       inputs:
@@ -178,13 +163,13 @@ stages:
           artifactName: 'extensions'
           downloadPath: '$(System.ArtifactsDirectory)'
       - task: PublishAzureDevOpsExtension@3
-        displayName: 'Publish SonarCloud test extension'
+        displayName: 'Publish codescancloud test extension'
         inputs:
           connectTo: 'VsTeam'
           connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
           fileType: 'vsix'
-          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion)-sonarcloud.vsix'
-          extensionName: '[Test] SonarCloud ITs'
+          vsixFile: '$(System.ArtifactsDirectory)/extensions/sonar-scanner-vsts-$(scExtensionVersion)-codescancloud.vsix'
+          extensionName: '[Test] codescancloud ITs'
           updateTasksVersion: false
           updateTasksId: false
           extensionVisibility: 'private'
@@ -197,7 +182,7 @@ stages:
           connectedServiceName: 'AzDo Extension - Marketplace - IntegrationTests'
           method: 'id'
           publisherId: '$(publisher)'
-          extensionId: 'sonarcloud'
+          extensionId: 'codescancloud'
           accounts: 'https://devops.azure.com/$(itOrg)'
 
 - stage: qa

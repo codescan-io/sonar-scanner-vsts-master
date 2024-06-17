@@ -112,10 +112,10 @@ function fileHashsum(filePath) {
 exports.fileHashsum = fileHashsum;
 
 exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionManifest) {
-  const sqPackageVersion = fullVersion(sqExtensionManifest.version);
-  const sqVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarqube.vsix`));
-  const sqAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarqube-cyclonedx.json,-sonarqube*.asc}`));
-  const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
+  //const sqPackageVersion = fullVersion(sqExtensionManifest.version);
+  //const sqVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarqube.vsix`));
+  //const sqAdditionalPaths = globby.sync(path.join(paths.build.root, `*{-sonarqube-cyclonedx.json,-sonarqube*.asc}`));
+  //const sqQualifierMatch = new RegExp(`${sqPackageVersion}-(.+)\.vsix$`);
 
   const scPackageVersion = fullVersion(scExtensionManifest.version);
   const scVsixPaths = globby.sync(path.join(paths.build.root, `*-sonarcloud.vsix`));
@@ -130,27 +130,27 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
     vcsRevision: process.env.CIRRUS_CHANGE_IN_REPO,
     vcsUrl: `https://github.com/${process.env.CIRRUS_REPO_FULL_NAME}.git`,
     modules: [
-      {
-        id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:${sqPackageVersion}`,
-        properties: {
-          artifactsToDownload: sqVsixPaths
-            .map(
-              filePath =>
-                `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:vsix:${filePath.match(sqQualifierMatch)[1]
-                }`
-            )
-            .join(',')
-        },
-        artifacts: [...sqVsixPaths, ...sqAdditionalPaths].map(filePath => {
-          const [sha1, md5] = fileHashsum(filePath);
-          return {
-            type: path.extname(filePath).slice(1),
-            sha1,
-            md5,
-            name: path.basename(filePath)
-          };
-        })
-      },
+      // {
+      //   id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:${sqPackageVersion}`,
+      //   properties: {
+      //     artifactsToDownload: sqVsixPaths
+      //       .map(
+      //         filePath =>
+      //           `org.sonarsource.scanner.vsts:${packageJson.name}-sonarqube:vsix:${filePath.match(sqQualifierMatch)[1]
+      //           }`
+      //       )
+      //       .join(',')
+      //   },
+      //   artifacts: [...sqVsixPaths, ...sqAdditionalPaths].map(filePath => {
+      //     const [sha1, md5] = fileHashsum(filePath);
+      //     return {
+      //       type: path.extname(filePath).slice(1),
+      //       sha1,
+      //       md5,
+      //       name: path.basename(filePath)
+      //     };
+      //   })
+      // },
       {
         id: `org.sonarsource.scanner.vsts:${packageJson.name}-sonarcloud:${scPackageVersion}`,
         properties: {
@@ -183,16 +183,16 @@ exports.getBuildInfo = function (packageJson, sqExtensionManifest, scExtensionMa
   };
 };
 
-exports.runSonnarQubeScanner = function (callback, options = {}) {
-  const customOptions = {
-    'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
-    'sonar.projectName': 'Azure DevOps extension for SonarQube',
-    'sonar.exclusions':
-      'build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**,' +
-      '**/temp-find-method.ts, **/package-lock.json, gulpfile.js'
-  };
-  runSonarQubeScannerImpl(callback, customOptions, options);
-};
+// exports.runSonnarQubeScanner = function (callback, options = {}) {
+//   const customOptions = {
+//     'sonar.projectKey': 'org.sonarsource.scanner.vsts:sonar-scanner-vsts',
+//     'sonar.projectName': 'Azure DevOps extension for SonarQube',
+//     'sonar.exclusions':
+//       'build/**, extensions/sonarcloud/**, coverage/**, node_modules/**, **/node_modules/**, **/__tests__/**,' +
+//       '**/temp-find-method.ts, **/package-lock.json, gulpfile.js'
+//   };
+//   runSonarQubeScannerImpl(callback, customOptions, options);
+// };
 
 exports.runSonnarQubeScannerForSonarCloud = function (callback, options = {}) {
   const customOptions = {
