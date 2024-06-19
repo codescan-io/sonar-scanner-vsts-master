@@ -4,22 +4,6 @@ You can start a no-commitment, 14-day trial of CodescanCloud for your private re
 
 This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. CodescanCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
 
-To get started in a few minutes, you can:
-
-- Follow this dedicated [Microsoft Lab][getstarted]
-- Follow the CodescanCloud walkthrough in this Microsoft Learning Module: [Scan code for vulnerabilities in Azure Pipelines][msft_learn].
-- Benefit from embedded templates for common analyses:
-  - **Classic** build pipelines templates integrated while creating a new pipeline
-- Benefit from a bunch of sample projects (using different build technologies), analyzed on CodescanCloud, with their **YAML** pipelines files (See the CodescanCloud badge on the README.md file for a link to CodescanCloud project)
-  - [.NET Framework](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-framework-project)
-  - [.NET Core](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-dotnet-core-project)
-  - [C++](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-cpp-project)
-  - [Gradle](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-gradle-project)
-  - [Maven](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-maven-project)
-  - [Node.js](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_git/sample-nodejs-project)
-- Get IDE Support with SonarLint integration to find code issues on the fly. CodescanCloud rules and analysis settings synchronize to SonarLint, aligning teams around a single standard of Clean Code
-- Get a free analysis for open-source projects
-- **Start a no-commitment, free 14-day trial for your private repositories**
 
 ## About the CodescanCloud Azure DevOps Marketplace Extension
 
@@ -81,8 +65,6 @@ Example of a passing Quality Gate:
 Example of a failing Quality Gate:
 
 ![Failed Quality Gate](img/sq-analysis-report-failed.png)
-
-Learn More - [CodescanCloud | Azure integration][learnmore]
 
 [sc]: <https://app.codescan.io>
 [getstarted]: <http://www.code-scan.com/cloud/install-configure-scanner-tfs-ts>
