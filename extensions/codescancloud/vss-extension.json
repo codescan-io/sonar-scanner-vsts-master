@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "codescan",
   "name": "CodeScan Cloud",
-  "version": "2.0",
+  "version": "2.0.1",
   "branding": {
     "color": "rgb(243, 243, 243)",
     "theme": "light"
@@ -94,14 +94,6 @@
       "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
         "name": "tasks/publish"
-      }
-    },
-    {
-      "id": "6350bfb8-c310-4cdd-af68-722f33cf440a",
-      "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
-      "properties": {
-        "name": "tasks/qgstatus"
       }
     },
     {
