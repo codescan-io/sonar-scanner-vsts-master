@@ -26,8 +26,7 @@ exports.paths = {
     extensions: {
       root: path.join(buildPath, 'extensions'),
       tasks: path.join(buildPath, 'extensions', '**', 'tasks'),
-      sonarqubeTasks: path.join(buildPath, 'extensions', 'sonarqube', 'tasks'),
-      sonarcloudTasks: path.join(buildPath, 'extensions', 'sonarcloud', 'tasks')
+      codescancloudTasks: path.join(buildPath, 'extensions', 'codescancloud', 'tasks')
     },
     classicScanner: path.join(buildPath, 'tmp', 'classic-sonar-scanner-msbuild'),
     dotnetScanner: path.join(buildPath, 'tmp', 'dotnet-sonar-scanner-msbuild')

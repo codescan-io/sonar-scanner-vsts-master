@@ -279,23 +279,14 @@ gulp.task("tasks:v5:commonv5:copy", () => {
 
 gulp.task("tasks:cycloneDx:sonarcloud", () =>
   cycloneDxPipe(
-    "sonarcloud",
+    "codescancloud",
     packageJSON,
-    path.join(paths.extensions.root, "sonarcloud"),
+    path.join(paths.extensions.root, "codescancloud"),
     paths.commonv5.new,
   ),
 );
 
-gulp.task("tasks:cycloneDx:sonarqube", () =>
-  cycloneDxPipe(
-    "sonarqube",
-    path.join(paths.extensions.root, "sonarqube"),
-    paths.common.new,
-    paths.commonv5.new,
-  ),
-);
-
-gulp.task("cycloneDx", gulp.series("tasks:cycloneDx:sonarqube", "tasks:cycloneDx:sonarcloud"));
+gulp.task("cycloneDx", gulp.series("tasks:cycloneDx:sonarcloud"));
 
 gulp.task(
   "tasks:sonarcloud:v1:bundle",
@@ -370,25 +361,12 @@ gulp.task("scanner:download", () => {
 gulp.task("scanner:extract-scanners", () => {
   // Extract Windows scanner for MSBuild
   const scannerFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "prepare", "old", "SonarQubeScannerMsBuild"),
     path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "classic-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "classic-sonar-scanner-msbuild",
-    ),
+          paths.build.extensions.codescancloudTasks,
+          'prepare',
+          'new',
+          'classic-sonar-scanner-msbuild'
+        )
   ];
   let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
   scannerFolders.forEach((dir) => {
@@ -398,23 +376,11 @@ gulp.task("scanner:extract-scanners", () => {
   // Extract dotnet for MSBuild
   const dotnetScannerFolders = [
     path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v4",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarqubeTasks,
-      "prepare",
-      "v5",
-      "dotnet-sonar-scanner-msbuild",
-    ),
-    path.join(
-      paths.build.extensions.sonarcloudTasks,
-      "prepare",
-      "v1",
-      "dotnet-sonar-scanner-msbuild",
-    ),
+          paths.build.extensions.codescancloudTasks,
+          'prepare',
+          'new',
+          'dotnet-sonar-scanner-msbuild'
+        )
   ];
   let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
   dotnetScannerFolders.forEach((dir) => {
@@ -423,14 +389,11 @@ gulp.task("scanner:extract-scanners", () => {
 
   // Extract CLI scanner to 'analyze' tasks
   const cliFolders = [
-    path.join(paths.build.extensions.sonarqubeTasks, "scanner-cli", "old", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v4", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarqubeTasks, "analyze", "v5", "sonar-scanner"),
-    path.join(paths.build.extensions.sonarcloudTasks, "analyze", "v1", "sonar-scanner"),
+    path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
   ];
   let cliPipe = gulp.src(
-    pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`),
-  );
+      pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
+    );
   cliFolders.forEach((dir) => {
     cliPipe = cliPipe.pipe(gulp.dest(dir));
   });
@@ -471,7 +434,7 @@ gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
     .forEach((extension) =>
-      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "foo")),
+      tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
   done();
 });
@@ -518,61 +481,7 @@ gulp.task("build:test", gulp.series("clean", "copy", "test", "tfx:test"));
  *  DEPLOY TASKS
  * =========================
  */
-gulp.task("deploy:vsix:sonarqube", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gutil.log("Not on master nor PR, skip deploy:vsix");
-    return gutil.noop;
-  }
-  if (process.env.CIRRUS_PR && process.env.DEPLOY_PULL_REQUEST === "false") {
-    gutil.log("On PR, but artifacts should not be deployed, skip deploy:vsix");
-    return gutil.noop;
-  }
-  const { name } = packageJSON;
 
-  return mergeStream(
-    globby
-      .sync(
-        path.join(paths.build.root, "*{-sonarqube.vsix,-sonarqube-cyclonedx.json,-sonarqube*.asc}"),
-      )
-      .map((filePath) => {
-        const [sha1, md5] = fileHashsum(filePath);
-        const extensionPath = path.join(paths.build.extensions.root, "sonarqube");
-        const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-        const packageVersion = fullVersion(vssExtension.version);
-        return gulp
-          .src(filePath)
-          .pipe(
-            artifactoryUpload({
-              url:
-                process.env.ARTIFACTORY_URL +
-                "/" +
-                process.env.ARTIFACTORY_DEPLOY_REPO +
-                "/org/sonarsource/scanner/vsts/" +
-                name +
-                "/" +
-                "sonarqube" +
-                "/" +
-                packageVersion,
-              username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
-              password: process.env.ARTIFACTORY_DEPLOY_PASSWORD,
-              properties: {
-                "vcs.revision": process.env.CIRRUS_CHANGE_IN_REPO,
-                "vcs.branch": process.env.CIRRUS_BRANCH,
-                "build.name": name,
-                "build.number": process.env.BUILD_NUMBER,
-              },
-              request: {
-                headers: {
-                  "X-Checksum-MD5": md5,
-                  "X-Checksum-Sha1": sha1,
-                },
-              },
-            }),
-          )
-          .on("error", gutil.log);
-      }),
-  );
-});
 
 gulp.task("deploy:vsix:sonarcloud", () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
@@ -590,11 +499,11 @@ gulp.task("deploy:vsix:sonarcloud", () => {
       .sync(
         path.join(
           paths.build.root,
-          "*{-sonarcloud.vsix,-sonarcloud-cyclonedx.json,-sonarcloud*.asc}",
+          "*{-codescancloud.vsix,-codescancloud-cyclonedx.json,-codescancloud*.asc}",
         ),
       )
       .map((filePath) => {
-        const extensionPath = path.join(paths.build.extensions.root, "sonarcloud");
+        const extensionPath = path.join(paths.build.extensions.root, "codescancloud");
         const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
         const packageVersion = fullVersion(vssExtension.version);
         const [sha1, md5] = fileHashsum(filePath);
@@ -609,7 +518,7 @@ gulp.task("deploy:vsix:sonarcloud", () => {
                 "/org/sonarsource/scanner/vsts/" +
                 name +
                 "/" +
-                "sonarcloud" +
+                "codescancloud" +
                 "/" +
                 packageVersion,
               username: process.env.ARTIFACTORY_DEPLOY_USERNAME,
@@ -643,11 +552,11 @@ gulp.task("deploy:buildinfo", () => {
     return gutil.noop;
   }
 
-  const sqExtensionPath = path.join(paths.build.extensions.root, "sonarqube");
-  const sqVssExtension = fs.readJsonSync(path.join(sqExtensionPath, "vss-extension.json"));
-  const scExtensionPath = path.join(paths.build.extensions.root, "sonarcloud");
+  // const sqExtensionPath = path.join(paths.build.extensions.root, "sonarqube");
+  // const sqVssExtension = fs.readJsonSync(path.join(sqExtensionPath, "vss-extension.json"));
+  const scExtensionPath = path.join(paths.build.extensions.root, "codescancloud");
   const scVssExtension = fs.readJsonSync(path.join(scExtensionPath, "vss-extension.json"));
-  const buildInfo = getBuildInfo(packageJSON, sqVssExtension, scVssExtension);
+  const buildInfo = getBuildInfo(packageJSON, scVssExtension);
   console.log("deploy build info", buildInfo);
   return fetch(process.env.ARTIFACTORY_URL + "/api/build", {
     method: "put",
@@ -679,7 +588,7 @@ gulp.task(
     "build",
     "sign",
     "deploy:buildinfo",
-    "deploy:vsix:sonarqube",
+    // "deploy:vsix:sonarqube",
     "deploy:vsix:sonarcloud",
   ),
 );
@@ -690,31 +599,31 @@ gulp.task(
  * =========================
  */
 
-gulp.task("sonarqube-analysis:sonarqube", (done) => {
-  const extensionPath = path.join(paths.extensions.root, "sonarqube");
-  const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-  const projectVersion = vssExtension.version;
-  if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
-    runSonnarQubeScanner(done, {
-      "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
-      "sonar.projectVersion": projectVersion,
-    });
-  } else if (process.env.CIRRUS_PR) {
-    runSonnarQubeScanner(done, {
-      "sonar.analysis.prNumber": process.env.CIRRUS_PR,
-      "sonar.pullrequest.key": process.env.CIRRUS_PR,
-      "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
-      "sonar.pullrequest.base": process.env.CIRRUS_BASE,
-      "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
-      "sonar.projectVersion": projectVersion,
-    });
-  } else {
-    done();
-  }
-});
+// gulp.task("sonarqube-analysis:sonarqube", (done) => {
+//   const extensionPath = path.join(paths.extensions.root, "sonarqube");
+//   const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+//   const projectVersion = vssExtension.version;
+//   if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
+//     runSonnarQubeScanner(done, {
+//       "sonar.analysis.sha1": process.env.CIRRUS_CHANGE_IN_REPO,
+//       "sonar.projectVersion": projectVersion,
+//     });
+//   } else if (process.env.CIRRUS_PR) {
+//     runSonnarQubeScanner(done, {
+//       "sonar.analysis.prNumber": process.env.CIRRUS_PR,
+//       "sonar.pullrequest.key": process.env.CIRRUS_PR,
+//       "sonar.pullrequest.branch": process.env.CIRRUS_BRANCH,
+//       "sonar.pullrequest.base": process.env.CIRRUS_BASE,
+//       "sonar.analysis.sha1": process.env.CIRRUS_BASE_SHA,
+//       "sonar.projectVersion": projectVersion,
+//     });
+//   } else {
+//     done();
+//   }
+// });
 
 gulp.task("sonarqube-analysis:sonarcloud", (done) => {
-  const extensionPath = path.join(paths.extensions.root, "sonarcloud");
+  const extensionPath = path.join(paths.extensions.root, "codescancloud");
   const vssExtension = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const projectVersion = vssExtension.version;
   if (process.env.CIRRUS_BRANCH === "master" && !process.env.CIRRUS_PR) {
@@ -775,12 +684,12 @@ gulp.task("burgr:sonarcloud", () => {
     return gutil.noop;
   }
 
-  const extensionPath = path.join(paths.extensions.root, "sonarcloud");
+  const extensionPath = path.join(paths.extensions.root, "codescancloud");
   const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
   const extensionVersion = manifestFile.version;
   const packageVersion = fullVersion(extensionVersion);
 
-  const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarcloud/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarcloud.vsix`;
+  const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/codescancloud/${packageVersion}/sonar-scanner-vsts-${packageVersion}-codescancloud.vsix`;
 
   const apiUrl = [
     process.env.BURGR_URL,
@@ -806,41 +715,41 @@ gulp.task("burgr:sonarcloud", () => {
   });
 });
 
-gulp.task("burgr:sonarqube", () => {
-  if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
-    gutil.log("Not on master nor PR, skip burgr");
-    return gutil.noop;
-  }
+// gulp.task("burgr:sonarqube", () => {
+//   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
+//     gutil.log("Not on master nor PR, skip burgr");
+//     return gutil.noop;
+//   }
 
-  const extensionPath = path.join(paths.extensions.root, "sonarqube");
-  const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
-  const extensionVersion = manifestFile.version;
-  const packageVersion = fullVersion(extensionVersion);
+//   const extensionPath = path.join(paths.extensions.root, "sonarqube");
+//   const manifestFile = fs.readJsonSync(path.join(extensionPath, "vss-extension.json"));
+//   const extensionVersion = manifestFile.version;
+//   const packageVersion = fullVersion(extensionVersion);
 
-  const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarqube/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarqube.vsix`;
+//   const url = `${process.env.ARTIFACTORY_URL}/sonarsource/org/sonarsource/scanner/vsts/sonar-scanner-vsts/sonarqube/${packageVersion}/sonar-scanner-vsts-${packageVersion}-sonarqube.vsix`;
 
-  const apiUrl = [
-    process.env.BURGR_URL,
-    "api/promote",
-    process.env.CIRRUS_REPO_OWNER,
-    process.env.CIRRUS_REPO_NAME,
-    process.env.CIRRUS_BUILD_ID,
-  ].join("/");
+//   const apiUrl = [
+//     process.env.BURGR_URL,
+//     "api/promote",
+//     process.env.CIRRUS_REPO_OWNER,
+//     process.env.CIRRUS_REPO_NAME,
+//     process.env.CIRRUS_BUILD_ID,
+//   ].join("/");
 
-  return fetch(apiUrl, {
-    method: "post",
-    body: JSON.stringify({
-      version: packageVersion,
-      url,
-      buildNumber: process.env.BUILD_NUMBER,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.BURGR_USERNAME}:${process.env.BURGR_PASSWORD}`,
-      ).toString("base64")}`,
-    },
-  });
-});
+//   return fetch(apiUrl, {
+//     method: "post",
+//     body: JSON.stringify({
+//       version: packageVersion,
+//       url,
+//       buildNumber: process.env.BUILD_NUMBER,
+//     }),
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Basic ${Buffer.from(
+//         `${process.env.BURGR_USERNAME}:${process.env.BURGR_PASSWORD}`,
+//       ).toString("base64")}`,
+//     },
+//   });
+// });
 
 gulp.task("default", gulp.series("build"));
