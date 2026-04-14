@@ -273,8 +273,12 @@ function copyIconsTask(icon = 'task_icon.png') {
   return () =>
     mergeStream(
       globby.sync(path.join(paths.extensions.root, '*'), { nodir: false }).map(extension => {
+        let iconPath = path.join(extension, 'tasks_icons', icon);
+        if (!fs.existsSync(iconPath)) {
+          return gulp.src('.', { allowEmpty: true });
+        }
         let iconPipe = gulp
-          .src(path.join(extension, 'tasks_icons', icon))
+          .src(iconPath)
           .pipe(gulpRename('icon.png'));
         globby.sync(path.join(extension, 'tasks', '*', '*'), { nodir: false }).forEach(dir => {
           iconPipe = iconPipe.pipe(

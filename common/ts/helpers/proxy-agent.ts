@@ -1,6 +1,7 @@
 import http from "http";
 import https from "https";
 import url, { UrlWithStringQuery } from "url";
+import { Duplex } from "stream";
 import { Status } from "./constants";
 
 interface HttpProxyAgentOptions extends http.AgentOptions {
@@ -32,7 +33,7 @@ export class HttpProxyAgent extends http.Agent {
     this.proxyRequestOptions = options.proxyRequestOptions || {};
   }
 
-  createConnection(options: http.RequestOptions, callback) {
+  createConnection(options: http.RequestOptions, callback: (err: Error | null, socket: Duplex | null) => void): Duplex {
     const requestOptions: https.RequestOptions = Object.assign({}, this.proxyRequestOptions, {
       method: "CONNECT",
       host: this.proxy.hostname,
@@ -82,6 +83,8 @@ export class HttpProxyAgent extends http.Agent {
     });
 
     request.end();
+
+    return new Duplex();
   }
 }
 
@@ -96,7 +99,7 @@ export class HttpsProxyAgent extends https.Agent {
     this.proxyRequestOptions = options.proxyRequestOptions || {};
   }
 
-  createConnection(options: https.RequestOptions, callback) {
+  createConnection(options: https.RequestOptions, callback: (err: Error | null, socket: Duplex | null) => void): Duplex {
     const requestOptions: https.RequestOptions = Object.assign({}, this.proxyRequestOptions, {
       method: "CONNECT",
       host: this.proxy.hostname,
@@ -150,6 +153,8 @@ export class HttpsProxyAgent extends https.Agent {
     });
 
     request.end();
+
+    return new Duplex();
   }
 }
 

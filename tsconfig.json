@@ -10,7 +10,14 @@
     "esModuleInterop": true,
     "moduleResolution": "node" ,
     "rootDir": "./",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "lib": [ "es2022", "DOM" ],
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "useUnknownInCatchVariables": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "./common/ts/**/*.ts",

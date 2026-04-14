@@ -14,7 +14,7 @@ const globby = require("globby");
 const jeditor = require("gulp-json-editor");
 const es = require("event-stream");
 const mergeStream = require("merge-stream");
-const typescript = require("typescript");
+const typescript = require("./node_modules/typescript");
 const needle = require("needle");
 const { paths, pathAllFiles } = require("./config/paths");
 const {
@@ -103,7 +103,7 @@ gulp.task("tasks:sonarcloud:v1:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -118,7 +118,7 @@ gulp.task("tasks:v4:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -133,7 +133,7 @@ gulp.task("tasks:v5:ts", () =>
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -148,7 +148,7 @@ gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     });
   globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
@@ -169,7 +169,7 @@ gulp.task("tasks:sonarqube:v4:common:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     });
   globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
@@ -190,7 +190,7 @@ gulp.task("tasks:v5:commonv5:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      this.once("finish", () => process.exit(1));
+      process.exit(1);
     });
   globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
@@ -419,6 +419,7 @@ gulp.task(
 gulp.task("tfx", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter(extension => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) => tfxCommand(extension, packageJSON));
   done();
 });
@@ -433,6 +434,7 @@ gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
 gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter(extension => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) =>
       tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
@@ -441,7 +443,9 @@ gulp.task("tfx:test", (done) => {
 
 gulp.task("extension:test", () =>
   mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
+    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false })
+      .filter(extension => fs.existsSync(path.join(extension, "vss-extension.test.json")))
+      .map((extension) =>
       mergeStream(
         gulp
           .src(path.join(extension, "extension-icon.test.png"))
