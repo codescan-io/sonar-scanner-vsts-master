@@ -113,6 +113,7 @@
       "nodejs-file-downloader": {
         "follow-redirects": "1.15.6"
       }
-    }
+    },
+    "@types/babel__traverse": "7.20.1"
   }
 }
