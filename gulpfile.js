@@ -464,11 +464,17 @@ gulp.task("extension:test", () =>
               paths.build.extensions.root,
               path.relative(paths.extensions.root, extension),
               "vss-extension.json",
-            ),
-            { base: "./" },
+            )
           )
           .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
-          .pipe(gulp.dest("./")),
+          .pipe(
+            gulp.dest(
+              path.join(
+                paths.build.extensions.root,
+                path.relative(paths.extensions.root, extension),
+              ),
+            ),
+          ),
       ),
     ),
   ),

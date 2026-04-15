@@ -105,6 +105,29 @@ export default class Scanner {
   }
 }
 
+/**
+ * SEC-003: Centralized environment builder for scanner execution.
+ * Enforces SONAR_TOKEN-based authentication and removes legacy credential paths.
+ */
+function buildSonarEnv(): { [key: string]: string } {
+  const execEnv: { [key: string]: string } = { ...process.env };
+  const endpoint = tl.getVariable(TaskVariables.SonarQubeEndpoint);
+
+  if (!endpoint) {
+    return execEnv;
+  }
+
+  const parsed = JSON.parse(endpoint);
+
+  if (parsed.data?.token) {
+    execEnv.SONAR_TOKEN = parsed.data.token;
+  } else {
+    throw new Error("SONAR_TOKEN is required. Username/password auth is not supported.");
+  }
+
+  return execEnv;
+}
+
 interface ScannerCLIData {
   projectSettings?: string;
   projectKey?: string;
@@ -148,7 +171,7 @@ export class ScannerCLI extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("-X");
     }
-    await scannerRunner.execAsync();
+    await (scannerRunner as any).execAsync({ env: buildSonarEnv() });
   }
 
   public static getScanner(rootPath: string) {
@@ -219,7 +242,7 @@ export class ScannerMSBuild extends Scanner {
     if (this.isDebug()) {
       scannerRunner.arg("/d:sonar.verbose=true");
     }
-    await scannerRunner.execAsync();
+    await (scannerRunner as any).execAsync({ env: buildSonarEnv() });
   }
 
   private async makeShellScriptExecutable(scannerExecutablePath: string) {
@@ -257,7 +280,7 @@ export class ScannerMSBuild extends Scanner {
     scannerRunner.arg("end");
     this.logIssueOnBuildSummaryForStdErr(scannerRunner);
     this.logIssueAsWarningForStdOut(scannerRunner);
-    await scannerRunner.execAsync();
+    await (scannerRunner as any).execAsync({ env: buildSonarEnv() });
   }
 
   public static getScanner(rootPath: string) {
