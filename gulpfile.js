@@ -362,11 +362,11 @@ gulp.task("scanner:extract-scanners", () => {
   // Extract Windows scanner for MSBuild
   const scannerFolders = [
     path.join(
-          paths.build.extensions.codescancloudTasks,
-          'prepare',
-          'new',
-          'classic-sonar-scanner-msbuild'
-        )
+      paths.build.extensions.codescancloudTasks,
+      "prepare",
+      "new",
+      "classic-sonar-scanner-msbuild",
+    ),
   ];
   let scannerPipe = gulp.src(pathAllFiles(paths.build.classicScanner));
   scannerFolders.forEach((dir) => {
@@ -376,11 +376,11 @@ gulp.task("scanner:extract-scanners", () => {
   // Extract dotnet for MSBuild
   const dotnetScannerFolders = [
     path.join(
-          paths.build.extensions.codescancloudTasks,
-          'prepare',
-          'new',
-          'dotnet-sonar-scanner-msbuild'
-        )
+      paths.build.extensions.codescancloudTasks,
+      "prepare",
+      "new",
+      "dotnet-sonar-scanner-msbuild",
+    ),
   ];
   let dotnetScannerPipe = gulp.src(pathAllFiles(paths.build.dotnetScanner));
   dotnetScannerFolders.forEach((dir) => {
@@ -392,8 +392,8 @@ gulp.task("scanner:extract-scanners", () => {
     path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
   ];
   let cliPipe = gulp.src(
-      pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
-    );
+    pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`),
+  );
   cliFolders.forEach((dir) => {
     cliPipe = cliPipe.pipe(gulp.dest(dir));
   });
@@ -419,7 +419,6 @@ gulp.task(
 gulp.task("tfx", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
-    .filter(extension => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) => tfxCommand(extension, packageJSON));
   done();
 });
@@ -434,7 +433,6 @@ gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
 gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
-    .filter(extension => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) =>
       tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
@@ -443,9 +441,7 @@ gulp.task("tfx:test", (done) => {
 
 gulp.task("extension:test", () =>
   mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false })
-      .filter(extension => fs.existsSync(path.join(extension, "vss-extension.test.json")))
-      .map((extension) =>
+    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
       mergeStream(
         gulp
           .src(path.join(extension, "extension-icon.test.png"))
@@ -485,7 +481,6 @@ gulp.task("build:test", gulp.series("clean", "copy", "test", "tfx:test"));
  *  DEPLOY TASKS
  * =========================
  */
-
 
 gulp.task("deploy:vsix:sonarcloud", () => {
   if (process.env.CIRRUS_BRANCH !== "master" && !process.env.CIRRUS_PR) {
