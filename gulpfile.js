@@ -102,8 +102,8 @@ gulp.task("tasks:sonarcloud:v1:ts", () =>
       "!" + path.join("**", "__tests__", "**"),
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", function(err) {
-      this.emit("end");
+    .once("error", () => {
+      this.once("finish", () => process.exit(1));
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -117,8 +117,8 @@ gulp.task("tasks:v4:ts", () =>
       "!" + path.join("**", "__tests__", "**"),
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", function(err) {
-      this.emit("end");
+    .once("error", () => {
+      this.once("finish", () => process.exit(1));
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -132,8 +132,8 @@ gulp.task("tasks:v5:ts", () =>
       "!" + path.join("**", "__tests__", "**"),
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
-    .once("error", function(err) {
-      this.emit("end");
+    .once("error", () => {
+      this.once("finish", () => process.exit(1));
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
@@ -148,7 +148,7 @@ gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      process.exit(1);
+      this.once("finish", () => process.exit(1));
     });
   globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
@@ -169,7 +169,7 @@ gulp.task("tasks:sonarqube:v4:common:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      process.exit(1);
+      this.once("finish", () => process.exit(1));
     });
   globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
@@ -190,7 +190,7 @@ gulp.task("tasks:v5:commonv5:ts", () => {
     ])
     .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
     .once("error", () => {
-      process.exit(1);
+      this.once("finish", () => process.exit(1));
     });
   globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
