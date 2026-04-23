@@ -23,3 +23,34 @@ export function sanitizeScannerParams(scannerParams: ScannerParams) {
 export function isWindows() {
   return tl.getPlatform() === tl.Platform.Windows;
 }
+
+/**
+ * Validates scanner mode input against allowed values
+ */
+export function validateScannerMode(mode: string): string {
+  const allowedModes = ["MSBuild", "CLI", "Other"];
+  if (!mode || !allowedModes.includes(mode)) {
+    throw new Error(`Invalid scanner mode: ${mode}. Allowed values: ${allowedModes.join(", ")}`);
+  }
+  return mode;
+}
+
+/**
+ * Validates and safely parses JSON input
+ */
+export function validateAndParseJson(jsonString: string, fieldName: string): any {
+  if (!jsonString || typeof jsonString !== 'string') {
+    throw new Error(`${fieldName} must be a non-empty string`);
+  }
+
+  try {
+    const parsed = JSON.parse(jsonString);
+    if (parsed === null || typeof parsed !== 'object') {
+      throw new Error(`${fieldName} must be a valid JSON object`);
+    }
+    return parsed;
+  } catch (error) {
+    throw new Error(`Invalid JSON in ${fieldName}: ${error.message}`);
+  }
+}
+
