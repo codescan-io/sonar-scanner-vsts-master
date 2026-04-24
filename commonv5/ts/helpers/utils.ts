@@ -17,6 +17,7 @@ export function stringifyScannerParams(scannerParams: ScannerParams) {
 export function sanitizeScannerParams(scannerParams: ScannerParams) {
   delete scannerParams[PROP_NAMES.LOGIN];
   delete scannerParams[PROP_NAMES.PASSSWORD];
+  delete scannerParams[PROP_NAMES.TOKEN];
   return scannerParams;
 }
 
@@ -24,9 +25,6 @@ export function isWindows() {
   return tl.getPlatform() === tl.Platform.Windows;
 }
 
-/**
- * Validates scanner mode input against allowed values
- */
 export function validateScannerMode(mode: string): string {
   const allowedModes = ["MSBuild", "CLI", "Other"];
   if (!mode || !allowedModes.includes(mode)) {
@@ -35,9 +33,6 @@ export function validateScannerMode(mode: string): string {
   return mode;
 }
 
-/**
- * Validates and safely parses JSON input
- */
 export function validateAndParseJson(jsonString: string, fieldName: string): any {
   if (!jsonString || typeof jsonString !== 'string') {
     throw new Error(`${fieldName} must be a non-empty string`);
@@ -53,4 +48,3 @@ export function validateAndParseJson(jsonString: string, fieldName: string): any
     throw new Error(`Invalid JSON in ${fieldName}: ${error.message}`);
   }
 }
-
