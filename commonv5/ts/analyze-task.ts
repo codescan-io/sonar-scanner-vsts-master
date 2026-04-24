@@ -50,7 +50,7 @@ export default async function analyzeTask(
     // Validate and parse JSON safely
     sqScannerParams = validateAndParseJson(paramsString, "scanner parameters");
   } catch (error) {
-    tl.setResult(tl.TaskResult.Failed, `Failed to parse scanner parameters: ${error.message}`);
+    tl.setResult(tl.TaskResult.Failed, "Failed to parse scanner parameters. Verify the Prepare task completed successfully.");
     return;
   }
 

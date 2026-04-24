@@ -44,11 +44,7 @@ export async function fetchProjectStatus(
     })) as { projectStatus: ProjectStatus };
     return projectStatus;
   } catch (error) {
-    if (error?.message) {
-      tl.error(`Error retrieving analysis: ${error.message}`);
-    } else if (error) {
-      tl.error(`Error retrieving analysis: ${JSON.stringify(error)}`);
-    }
+    tl.error("Error retrieving analysis. Check server connectivity and permissions.");
     throw new Error(`Could not fetch analysis for ID '${analysisId}'`);
   }
 }
@@ -70,12 +66,7 @@ export async function fetchMetrics(
     }
     return fetchMetrics(endpoint, { ...data, p: p + 1 }, { ...response, metrics: result });
   } catch (error) {
-    if (error?.message) {
-      tl.error(error.message);
-    } else if (error) {
-      tl.error(JSON.stringify(error));
-    }
-
+    tl.error("Error fetching metrics. Check server connectivity and permissions.");
     throw new Error(`Could not fetch metrics`);
   }
 }
@@ -93,12 +84,7 @@ export async function fetchComponentMeasures(
     )) as MeasureResponse;
     return response.component.measures;
   } catch (error) {
-    if (error?.message) {
-      tl.debug("Error fetching component measures: " + error.message);
-    } else if (error) {
-      tl.debug("Error fetching component measures: " + JSON.stringify(error));
-    }
-
+    tl.debug("Error fetching component measures. Check server connectivity and permissions.");
     throw new Error(`Could not fetch component measures`);
   }
 }

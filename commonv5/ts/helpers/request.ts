@@ -44,12 +44,8 @@ export async function get<T>(
       return await response.text();
     }
   } catch (error) {
-    if (error.response) {
-      tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
-    } else {
-      tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
-    }
-    throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+    tl.debug(`[SQ] API GET '${path}' failed`);
+    throw new Error(`[SQ] API GET '${path}' failed`);
   }
 }
 
