@@ -45,6 +45,7 @@ export function validateAndParseJson(jsonString: string, fieldName: string): any
     }
     return parsed;
   } catch (error) {
+    // Do not include error.message as it may contain sensitive input data (CWE-532)
     throw new Error(`Invalid JSON in ${fieldName}`);
   }
 }

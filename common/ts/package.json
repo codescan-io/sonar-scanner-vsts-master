@@ -16,10 +16,10 @@
     "node": ">=6"
   },
   "overrides": {
-    "follow-redirects": "1.16.0",
-    "minimatch": "3.1.5",
-    "underscore": "1.13.8",
-    "qs": "6.15.1",
-    "brace-expansion": "1.1.14"
+    "azure-pipelines-task-lib": {
+      "nodejs-file-downloader": {
+        "follow-redirects": "1.15.6"
+      }
+    }
   }
 }
