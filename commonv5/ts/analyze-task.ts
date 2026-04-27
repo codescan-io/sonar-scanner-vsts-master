@@ -54,13 +54,16 @@ export default async function analyzeTask(
     return;
   }
 
-  await scanner.runAnalysis();
-
-  // Sanitize scanner params (SSF-194)
+  // Sanitize scanner params immediately after parsing to prevent
+  // sensitive values (tokens, passwords) from leaking into logs
+  // during analysis execution (CWE-532)
+  const sanitizedParams = sanitizeScannerParams(sqScannerParams);
   tl.setVariable(
     TaskVariables.SonarQubeScannerParams,
-    stringifyScannerParams(sanitizeScannerParams(sqScannerParams)),
+    stringifyScannerParams(sanitizedParams),
   );
+
+  await scanner.runAnalysis();
 
   JavaVersionResolver.revertJavaHomeToOriginal();
 }
