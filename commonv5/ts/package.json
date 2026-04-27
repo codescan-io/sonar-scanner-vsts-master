@@ -14,13 +14,13 @@
     "semver": "5.7.2"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=18"
   },
   "overrides": {
-    "azure-pipelines-task-lib": {
-      "nodejs-file-downloader": {
-        "follow-redirects": "1.15.6"
-      }
-    }
+    "follow-redirects": "1.16.0",
+    "minimatch": "3.1.5",
+    "underscore": "1.13.8",
+    "qs": "6.15.1",
+    "brace-expansion": "1.1.14"
   }
 }
