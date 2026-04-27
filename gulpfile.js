@@ -419,6 +419,7 @@ gulp.task(
 gulp.task("tfx", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) => tfxCommand(extension, packageJSON));
   done();
 });
@@ -433,6 +434,7 @@ gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
 gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) =>
       tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
@@ -441,32 +443,34 @@ gulp.task("tfx:test", (done) => {
 
 gulp.task("extension:test", () =>
   mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
-      mergeStream(
-        gulp
-          .src(path.join(extension, "extension-icon.test.png"))
-          .pipe(gulpRename("extension-icon.png"))
-          .pipe(
-            gulp.dest(
+    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false })
+      .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.test.json")))
+      .map((extension) =>
+        mergeStream(
+          gulp
+            .src(path.join(extension, "extension-icon.test.png"))
+            .pipe(gulpRename("extension-icon.png"))
+            .pipe(
+              gulp.dest(
+                path.join(
+                  paths.build.extensions.root,
+                  path.relative(paths.extensions.root, extension),
+                ),
+              ),
+            ),
+          gulp
+            .src(
               path.join(
                 paths.build.extensions.root,
                 path.relative(paths.extensions.root, extension),
+                "vss-extension.json",
               ),
-            ),
-          ),
-        gulp
-          .src(
-            path.join(
-              paths.build.extensions.root,
-              path.relative(paths.extensions.root, extension),
-              "vss-extension.json",
-            ),
-            { base: "./" },
-          )
-          .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
-          .pipe(gulp.dest("./")),
+              { base: "./" },
+            )
+            .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
+            .pipe(gulp.dest("./")),
+        ),
       ),
-    ),
   ),
 );
 
