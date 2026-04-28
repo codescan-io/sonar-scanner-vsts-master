@@ -174,5 +174,5 @@ exports[`should render passing quality gate measures correctly 2`] = `
       width: fit-content; 
     "
     href="https://dashboard.url"
-  >See analysis details on SonarCloud</a></div></div>"
+  >See analysis details on CodeScanCloud</a></div></div>"
 `;

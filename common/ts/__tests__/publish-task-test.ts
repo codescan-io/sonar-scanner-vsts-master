@@ -23,7 +23,7 @@ const TASK_REPORT = new TaskReport({
   serverUrl: "http:/serverUrl1",
 });
 
-const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
+const SC_ENDPOINT = new Endpoint(EndpointType.CodeScanCloud, { url: "https://endpoint.url" });
 const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
 const METRICS = new Metrics([]);
 
@@ -31,12 +31,12 @@ it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => null);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.getVariable).toBeCalledWith("SONARQUBE_SCANNER_PARAMS");
   expect(tl.setResult).toBeCalledWith(
     tl.TaskResult.Failed,
-    "The SonarCloud Prepare Analysis Configuration must be added.",
+    "The CodeScanCloud Prepare Analysis Configuration must be added.",
   );
 });
 
@@ -46,7 +46,7 @@ it("check multiple report status and set global quality gate for build propertie
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.CodeScanCloud,
     componentName: "componentName",
     warnings: [],
   });
@@ -69,7 +69,7 @@ it("check multiple report status and set global quality gate for build propertie
   // Mock converting the Task into an html report
   const returnedAnalysisOk = new Analysis(
     { status: "OK", conditions: [] },
-    EndpointType.SonarCloud,
+    EndpointType.CodeScanCloud,
     [],
     "",
     null,
@@ -98,7 +98,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
@@ -111,7 +111,7 @@ it("check multiple report status and set global quality gate for build propertie
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.CodeScanCloud,
     componentName: "componentName",
     warnings: [],
   });
@@ -136,7 +136,7 @@ it("check multiple report status and set global quality gate for build propertie
   // Mock converting the Task into an html report
   const returnedAnalysisOk = new Analysis(
     { status: "OK", conditions: [] },
-    EndpointType.SonarCloud,
+    EndpointType.CodeScanCloud,
     [],
     "",
     null,
@@ -145,7 +145,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   const returnedAnalysisError = new Analysis(
     { status: "ERROR", conditions: [] },
-    EndpointType.SonarCloud,
+    EndpointType.CodeScanCloud,
     [],
     "",
     null,
@@ -174,7 +174,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
@@ -229,7 +229,7 @@ it("get report string for single report", async () => {
   // Mock converting the Task into an html report
   const returnedAnalysis = new Analysis(
     { status: "", conditions: [] },
-    EndpointType.SonarCloud,
+    EndpointType.CodeScanCloud,
     [],
     "",
     null,
@@ -309,13 +309,13 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
       }),
   );
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.SonarCloud);
+  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.CodeScanCloud);
   expect(tl.setResult).not.toBeCalledWith(tl.TaskResult.Failed);
 
-  expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.SonarCloud);
+  expect(serverUtils.publishBuildSummary).toBeCalledWith("\r\n", EndpointType.CodeScanCloud);
 
   expect(tl.warning).toBeCalledWith(
     "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",

@@ -26,7 +26,7 @@ it("On SonarCloud password is always null", () => {
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
   jest.spyOn(tl, "getInput").mockImplementation(() => "organization");
 
-  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.SonarCloud);
+  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.CodeScanCloud);
 
   expect(result.toSonarProps()[PROP_NAMES.PASSSWORD]).toBeNull();
   expect(result.auth.pass).toBeUndefined();

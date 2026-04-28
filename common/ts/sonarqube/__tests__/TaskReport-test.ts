@@ -24,7 +24,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.CodeScanCloud, null);
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -64,7 +64,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.CodeScanCloud, null);
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -85,7 +85,7 @@ it("should find report files for SonarCloud", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => "mock root search path");
   jest.spyOn(tempFindMethods, "findMatch").mockImplementation(() => ["path1", "path2"]);
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.CodeScanCloud, null);
 
   const reportFiles = await TaskReport.findTaskFileReport(endpoint, new semver.SemVer("7.2.0"));
 
