@@ -51,7 +51,7 @@ export default async function analyzeTask(
 
   // Sanitize scanner params immediately after parsing to prevent
   // sensitive values (tokens, passwords) from leaking into logs
-  // during analysis execution (CWE-532)
+  // during analysis execution.
   const sanitizedParams = sanitizeScannerParams(sqScannerParams);
   tl.setVariable(
     TaskVariables.SonarQubeScannerParams,
