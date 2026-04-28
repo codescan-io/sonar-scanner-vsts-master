@@ -1,4 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
+import { Guid } from "guid-typescript";
+import * as path from "path";
 import { SemVer } from "semver";
 import * as request from "../helpers/request";
 import * as prept from "../prepare-task";
@@ -30,9 +32,31 @@ it("should display warning for dedicated extension for Sonarcloud", async () => 
   await prept.default(SQ_ENDPOINT, __dirname);
 
   expect(tl.warning).toHaveBeenCalledWith(
-    "This task is deprecated. Please upgrade to the latest version. For more information, refer to https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/",
+    "There is a dedicated extension for SonarCloud: https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud",
   );
 });
 
-// Note: "should build report task path from variables" test was removed
-// because the reportPath() function no longer exists in prepare-task.ts (pre-existing issue).
+it("should build report task path from variables", () => {
+  const reportDirectory = path.join("C:", "temp", "dir");
+  const sonarSubDirectory = "sonar";
+  const buildNumber = "20250909.1";
+
+  const guid = Guid.create();
+
+  jest.spyOn(Guid, "create").mockImplementation(() => guid);
+
+  const reportFullPath = path.join(
+    reportDirectory,
+    sonarSubDirectory,
+    buildNumber,
+    guid.toString(),
+    "report-task.txt",
+  );
+
+  jest.spyOn(tl, "getVariable").mockImplementationOnce(() => reportDirectory);
+  jest.spyOn(tl, "getVariable").mockImplementationOnce(() => buildNumber);
+
+  const actual = prept.reportPath();
+
+  expect(actual).toEqual(reportFullPath);
+});
