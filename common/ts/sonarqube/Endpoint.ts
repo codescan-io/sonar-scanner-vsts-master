@@ -66,7 +66,7 @@ export default class Endpoint {
       ? getProxyFromURI(url.parse(endpointUrl))
       : undefined;
     if (proxyUrl) {
-      tl.debug("Using proxy agent from environment variables : HTTP_PROXY,HTTPS_proxy");
+      tl.debug("Using proxy agent from environment: " + proxyUrl);
     } else {
       tl.debug("Not using a proxy agent");
     }
