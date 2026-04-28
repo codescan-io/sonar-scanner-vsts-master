@@ -32,11 +32,6 @@ export default async function analyzeTask(
 
   // Run scanner - validate scanner mode
   const scannerModeValue = tl.getVariable(TaskVariables.SonarQubeScannerMode);
-  if (!scannerModeValue) {
-    tl.setResult(tl.TaskResult.Failed, "Scanner mode is not set");
-    return;
-  }
-
   const validatedMode = validateScannerMode(scannerModeValue);
   const scannerMode: ScannerMode = ScannerMode[validatedMode];
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
