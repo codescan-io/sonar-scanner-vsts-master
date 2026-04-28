@@ -28,7 +28,7 @@ export function isWindows() {
 export function validateScannerMode(mode: string): string {
   const allowedModes = ["MSBuild", "CLI", "Other"];
   if (!mode || !allowedModes.includes(mode)) {
-    throw new Error(`Invalid scanner mode: ${mode}. Allowed values: ${allowedModes.join(", ")}`);
+    throw new Error(`Invalid scanner mode. Allowed values: ${allowedModes.join(", ")}`);
   }
   return mode;
 }
@@ -45,6 +45,7 @@ export function validateAndParseJson(jsonString: string, fieldName: string): any
     }
     return parsed;
   } catch (error) {
-    throw new Error(`Invalid JSON in ${fieldName}: ${error.message}`);
+    // Do not include error.message as it may contain sensitive input data (CWE-532)
+    throw new Error(`Invalid JSON in ${fieldName}`);
   }
 }
