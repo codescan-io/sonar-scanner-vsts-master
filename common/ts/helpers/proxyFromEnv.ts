@@ -1,4 +1,5 @@
 import { UrlWithStringQuery } from "url";
+import * as tl from "azure-pipelines-task-lib/task";
 
 function formatHostname(hostname: string) {
   // canonicalize the hostname, so that 'oogle.com' won't match 'google.com'
@@ -35,6 +36,25 @@ function uriInNoProxy(url: UrlWithStringQuery, noProxy: string) {
   });
 }
 
+/**
+ * Mask any embedded credentials in a proxy URL so they cannot leak into logs.
+ * Registers the password (and username) with Azure DevOps secret masking.
+ */
+function maskProxyCredentials(proxyUrl: string): string {
+  try {
+    const parsed = new URL(proxyUrl);
+    if (parsed.password) {
+      tl.setSecret(parsed.password);
+    }
+    if (parsed.username) {
+      tl.setSecret(parsed.username);
+    }
+  } catch {
+    // Not a valid URL — nothing to mask.
+  }
+  return proxyUrl;
+}
+
 export function getProxyFromURI(url: UrlWithStringQuery) {
   // Decide the proper request proxy to use based on the request URI object and the
   // environmental constiables (NO_PROXY, HTTP_PROXY, etc.)
@@ -56,22 +76,23 @@ export function getProxyFromURI(url: UrlWithStringQuery) {
 
   // Check for HTTP or HTTPS Proxy in environment Else default to null
 
-  if (url.protocol === "http:") {
-    return process.env.HTTP_PROXY || process.env.http_proxy || null;
-  }
+  let proxyUrl: string | null = null;
 
-  if (url.protocol === "https:") {
-    return (
+  if (url.protocol === "http:") {
+    proxyUrl = process.env.HTTP_PROXY || process.env.http_proxy || null;
+  } else if (url.protocol === "https:") {
+    proxyUrl =
       process.env.HTTPS_PROXY ||
       process.env.https_proxy ||
       process.env.HTTP_PROXY ||
       process.env.http_proxy ||
-      null
-    );
+      null;
   }
 
-  // if none of that works, return null
-  // (What uri protocol are you using then?)
+  // Mask any embedded credentials before returning.
+  if (proxyUrl) {
+    return maskProxyCredentials(proxyUrl);
+  }
 
   return null;
 }
