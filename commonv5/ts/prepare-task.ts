@@ -43,11 +43,6 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
   );
   tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 
-  tl.getDelimitedInput("extraProperties", "\n")
-    .filter((keyValue) => !keyValue.startsWith("#"))
-    .map((keyValue) => keyValue.split(/=(.+)/))
-    .forEach(([k, v]) => (props[k] = v));
-
   tl.setVariable(TaskVariables.SonarQubeScannerMode, scannerMode);
   tl.setVariable(TaskVariables.SonarQubeEndpoint, endpoint.toJson(), true);
 

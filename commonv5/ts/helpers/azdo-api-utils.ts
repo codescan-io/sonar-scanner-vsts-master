@@ -5,6 +5,7 @@ import {
   Operation,
 } from "azure-devops-node-api/interfaces/common/VSSInterfaces";
 import * as tl from "azure-pipelines-task-lib/task";
+import { PROP_NAMES } from "./constants";
 
 export interface IPropertyBag {
   propertyName: string;
@@ -61,11 +62,29 @@ export function getAuthToken() {
   }
 }
 
+const RESERVED_PROPERTY_KEYS = new Set([
+  PROP_NAMES.HOST_URL,
+  PROP_NAMES.LOGIN,
+  PROP_NAMES.TOKEN,
+  PROP_NAMES.PASSSWORD,
+  PROP_NAMES.ORG,
+]);
+
 export function parseScannerExtraProperties(): { [key: string]: string } {
   const props = {};
   tl.getDelimitedInput("extraProperties", "\n")
     .filter((keyValue) => !keyValue.startsWith("#"))
     .map((keyValue) => keyValue.split(/=(.+)/))
-    .forEach(([k, v]) => (props[k] = v));
+    .forEach(([k, v]) => {
+      if (k && RESERVED_PROPERTY_KEYS.has(k.trim())) {
+        tl.warning(
+          `Extra property '${k.trim()}' is reserved and cannot be overridden. Ignoring.`,
+        );
+        return;
+      }
+      if (k) {
+        props[k] = v;
+      }
+    });
   return props;
 }

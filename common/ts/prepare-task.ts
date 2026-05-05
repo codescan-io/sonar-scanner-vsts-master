@@ -1,7 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as azdoApiUtils from "./helpers/azdo-api-utils";
 import { DEPRECATION_MESSAGE } from "./helpers/constants";
-import { toCleanJSON } from "./helpers/utils";
+import { toCleanJSON, parseScannerExtraProperties } from "./helpers/utils";
 import Endpoint from './sonarqube/Endpoint';
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
@@ -26,10 +26,8 @@ export default async function prepareTask(endpoint: Endpoint, rootPath: string) 
     tl.debug(`[SQ] Branch and PR parameters: ${JSON.stringify(props)}`);
 
 
-  tl.getDelimitedInput("extraProperties", "\n")
-    .filter((keyValue) => !keyValue.startsWith("#"))
-    .map((keyValue) => keyValue.split(/=(.+)/))
-    .forEach(([k, v]) => (props[k] = v));
+  const extraProps = parseScannerExtraProperties();
+  Object.assign(props, extraProps);
 
   tl.setVariable("SONARQUBE_SCANNER_MODE", scannerMode);
   tl.setVariable("SONARQUBE_ENDPOINT", endpoint.toJson(), true);
