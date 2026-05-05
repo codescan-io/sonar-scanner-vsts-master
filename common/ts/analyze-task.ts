@@ -39,7 +39,8 @@ export default async function analyzeTask(
     sqScannerParams[PROP_NAMES.PASSSWORD] = endpointData.data.password;
   }
   tl.setVariable("SONARQUBE_SCANNER_PARAMS", JSON.stringify(sqScannerParams));
-  await scanner.runAnalysis();
   tl.setVariable("SONARQUBE_SCANNER_PARAMS", sanitizeVariable(JSON.stringify(sqScannerParams)));
+  await scanner.runAnalysis();
+
   JavaVersionResolver.revertJavaHomeToOriginal();
 }

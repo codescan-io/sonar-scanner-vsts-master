@@ -66,7 +66,7 @@ export default class Endpoint {
       ? getProxyFromURI(url.parse(endpointUrl))
       : undefined;
     if (proxyUrl) {
-      tl.debug("Using proxy agent from environment: " + proxyUrl);
+      tl.debug("Using proxy agent from environment");
     } else {
       tl.debug("Not using a proxy agent");
     }
@@ -104,6 +104,16 @@ export default class Endpoint {
     const username = tl.getEndpointAuthorizationParameter(id, "username", true);
     const password = tl.getEndpointAuthorizationParameter(id, "password", true);
     const organization = tl.getInput("organization", type === EndpointType.CodeScanCloud);
+
+    // Register sensitive credentials with AzDO secret masking so they
+    // cannot leak into pipeline logs.
+    if (token) {
+      tl.setSecret(token);
+    }
+    if (password) {
+      tl.setSecret(password);
+    }
+
     return new Endpoint(type, { url, token, username, password, organization });
   }
 }
