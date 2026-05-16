@@ -14,7 +14,7 @@
     "Minor": 17,
     "Patch": 0
   },
-  "minimumAgentVersion": "3.244.1",
+  "minimumAgentVersion": "3.248.0",
   "inputs": [
     {
       "name": "pollingTimeoutSec",
@@ -28,7 +28,10 @@
   ],
   "dataSourceBindings": [],
   "execution": {
-    "Node22_1": {
+    "Node24": {
+      "target": "publish.js"
+    },
+    "Node20_1": {
       "target": "publish.js"
     }
   }

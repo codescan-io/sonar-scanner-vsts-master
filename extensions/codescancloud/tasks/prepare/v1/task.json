@@ -14,7 +14,7 @@
     "Minor": 42,
     "Patch": 0
   },
-  "minimumAgentVersion": "3.244.1",
+  "minimumAgentVersion": "3.248.0",
   "instanceNameFormat": "Prepare analysis on CodeScan Cloud",
   "groups": [
     {
@@ -159,7 +159,10 @@
     }
   ],
   "execution": {
-    "Node22_1": {
+    "Node24": {
+      "target": "prepare.js"
+    },
+    "Node20_1": {
       "target": "prepare.js"
     }
   }
