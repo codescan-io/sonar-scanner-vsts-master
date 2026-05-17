@@ -49,16 +49,16 @@ export default async function analyzeTask(
     return;
   }
 
-  // Sanitize scanner params immediately after parsing to prevent
-  // sensitive values (tokens, passwords) from leaking into logs
-  // during analysis execution.
+  await scanner.runAnalysis();
+
+  // Scrub credentials from SONARQUBE_SCANNER_PARAMS only AFTER the scanner
+  // has run — the spawned sonar-scanner inherits this env var and needs
+  // sonar.token / sonar.login present to authenticate.
   const sanitizedParams = sanitizeScannerParams(sqScannerParams);
   tl.setVariable(
     TaskVariables.SonarQubeScannerParams,
     stringifyScannerParams(sanitizedParams),
   );
-
-  await scanner.runAnalysis();
 
   JavaVersionResolver.revertJavaHomeToOriginal();
 }
