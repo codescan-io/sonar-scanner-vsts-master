@@ -8,8 +8,8 @@
   "visibility": ["Build"],
   "author": "codescansf",
   "version": {
-    "Major": 1,
-    "Minor": 46,
+    "Major": 2,
+    "Minor": 0,
     "Patch": 0
   },
   "minimumAgentVersion": "3.248.0",
