@@ -49,8 +49,10 @@ function maskProxyCredentials(proxyUrl: string): string {
     if (parsed.username) {
       tl.setSecret(parsed.username);
     }
-  } catch {
-    // Not a valid URL — nothing to mask.
+  } catch (err) {
+    tl.debug(
+      `[SQ] maskProxyCredentials: unable to parse proxy URL, skipping mask (${(err as Error)?.message ?? "unknown error"})`,
+    );
   }
   return proxyUrl;
 }
