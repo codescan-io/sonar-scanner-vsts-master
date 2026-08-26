@@ -10,11 +10,11 @@
   ],
   "author": "codescansf",
   "version": {
-    "Major": 1,
-    "Minor": 43,
-    "Patch": 0
+    "Major": 3,
+    "Minor": 0,
+    "Patch": 8
   },
-  "minimumAgentVersion": "2.144.0",
+  "minimumAgentVersion": "3.248.0",
   "instanceNameFormat": "Prepare analysis on CodeScan Cloud",
   "groups": [
     {
@@ -159,7 +159,10 @@
     }
   ],
   "execution": {
-    "Node10": {
+    "Node24": {
+      "target": "prepare.js"
+    },
+    "Node20_1": {
       "target": "prepare.js"
     }
   }

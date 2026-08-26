@@ -8,11 +8,11 @@
   "visibility": ["Build"],
   "author": "codescansf",
   "version": {
-    "Major": 1,
-    "Minor": 47,
-    "Patch": 0
+    "Major": 3,
+    "Minor": 0,
+    "Patch": 8
   },
-  "minimumAgentVersion": "2.144.0",
+  "minimumAgentVersion": "3.248.0",
   "demands": ["java"],
   "inputs": [
     {
@@ -31,7 +31,10 @@
     }
   ],
   "execution": {
-    "Node10": {
+    "Node24": {
+      "target": "analyze.js"
+    },
+    "Node20_1": {
       "target": "analyze.js"
     }
   }
