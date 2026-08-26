@@ -12,7 +12,7 @@
   "version": {
     "Major": 3,
     "Minor": 0,
-    "Patch": 8
+    "Patch": 2
   },
   "minimumAgentVersion": "3.248.0",
   "instanceNameFormat": "Prepare analysis on CodeScan Cloud",

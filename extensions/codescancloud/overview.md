@@ -1,9 +1,6 @@
-**[CodeScan Cloud][sc]** enables your development team to deliver Clean Code consistently and efficiently by seamlessly integrating into your cloud DevOps platforms and extending your CI/CD workflow. This SaaS tool catches Security Vulnerabilities, Bugs, and Code Smells in your pull requests, branches, and throughout your repository, with more than 2 billion lines of code and 120,000+ active projects analyzed every week.
+**[CodeScan Cloud][sc]** enables your development team to deliver clean code consistently and efficiently by seamlessly integrating into your cloud DevOps platforms and extending your CI/CD workflow. This SaaS tool catches Security Vulnerabilities, Bugs, and Code Smells in your pull requests, branches, and throughout your repository.
 
-You can start a no-commitment, 14-day trial of CodescanCloud for your private repositories completely free. No need to speak with a sales rep or request a license key - get automatic code analysis results on your private projects in minutes! CodescanCloud analysis is always free for open-source projects. You can create your free CodescanCloud account [here][signup].
-
-This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. CodescanCloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way. At project level, you'll also get a dedicated widget that tracks the overall health of your application.
-
+This Azure DevOps extension provides build tasks that you can add in your build definition. You'll benefit from automated detection of bugs and vulnerabilities across all branches and Pull Requests. Codescan Cloud explains all coding issues in details, giving you chance to fix your code before even merging and deploying, all the while learning best practices along the way.
 
 ## About the CodescanCloud Azure DevOps Marketplace Extension
 
@@ -15,8 +12,7 @@ This extension provides the following features:
   - **Run Code Analysis** task, to actually execute the analysis of the source code. Not required for Maven or Gradle projects.
   - **Publish Quality Gate Result** task, to display the quality gate status in the build summary. This task is optional, as it can increase the overall build time.
 - Analysis of the branches and the **pull requests** of your projects
-- A **widget** to monitor the quality gate for your projects on your favorite dashboard
-- A **deployment gate (in preview)** allowing you to control your deployment process by checking the status of the Quality Gate of the last build related to the release pipeline executed.
+- A **Configurable Quality Gate** allowing you to control your deployments and merges by blocking code and configurations that do not meet your standards.
 
 Note that the above features are **available for all Git repository providers in Azure DevOps**: Azure Repos Git, Bitbucket Cloud or GitHub.
 
@@ -67,4 +63,4 @@ Example of a failing Quality Gate:
 ![Failed Quality Gate](img/sq-analysis-report-failed.png)
 
 [sc]: <https://app.codescan.io>
-[getstarted]: <http://www.code-scan.com/cloud/install-configure-scanner-tfs-ts>
+[getstarted]: <https://knowledgebase.autorabit.com/product-guides/codescan/codescan-integration/azure-devops/azure-devops-yaml-pipeline>
