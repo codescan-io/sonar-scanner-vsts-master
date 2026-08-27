@@ -63,7 +63,7 @@ it("should not fail when metrics are missing", () => {
   expect(analysis.getHtmlAnalysisReport()).toMatchSnapshot();
 });
 
-it.each([[EndpointType.SonarQube], [EndpointType.SonarCloud]])(
+it.each([[EndpointType.SonarQube], [EndpointType.CodeScanCloud]])(
   "should render passing quality gate measures correctly",
   (endpointType) => {
     const analysis = new HtmlAnalysisReport(

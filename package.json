@@ -74,7 +74,7 @@
     "cyclonedx": "gulp cycloneDx"
   },
   "engines": {
-    "node": ">=6",
+    "node": ">=18",
     "npm": ">=8"
   },
   "jest": {

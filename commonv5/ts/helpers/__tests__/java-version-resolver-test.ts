@@ -20,7 +20,7 @@ describe("JavaVersionResolver", () => {
   it.each([
     [EndpointType.SonarQube, "9.9.0"],
     [EndpointType.SonarQube, "10.4.0"],
-    [EndpointType.SonarCloud, "8.0.0"],
+    [EndpointType.CodeScanCloud, "8.0.0"],
   ])("should not have an effect if chosing JAVA_HOME", (endpointType, serverVersion) => {
     JavaVersionResolver.setJavaVersion(JdkVersionSource.JavaHome, endpointType, serverVersion);
 
@@ -38,9 +38,9 @@ describe("JavaVersionResolver", () => {
     [EndpointType.SonarQube, "9.9.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
     [EndpointType.SonarQube, "10.4", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
     [EndpointType.SonarQube, "10.4", JdkVersionSource.JavaHome21, "/opt/bin/java21/bin"],
-    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
-    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
-    [EndpointType.SonarCloud, "8.0.0", JdkVersionSource.JavaHome21, "/opt/bin/java21/bin"],
+    [EndpointType.CodeScanCloud, "8.0.0", JdkVersionSource.JavaHome11, "/opt/bin/java11/bin"],
+    [EndpointType.CodeScanCloud, "8.0.0", JdkVersionSource.JavaHome17, "/opt/bin/java17/bin"],
+    [EndpointType.CodeScanCloud, "8.0.0", JdkVersionSource.JavaHome21, "/opt/bin/java21/bin"],
   ])(
     "should use specified java version if specified and it exists (%s, %s, %s, %s)",
     (endpointType, serverVersion, jdkVersion, path) => {

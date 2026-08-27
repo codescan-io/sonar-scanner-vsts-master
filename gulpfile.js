@@ -79,6 +79,15 @@ gulp.task("npminstall", () =>
     .pipe(es.mapSync((file) => npmInstallTask(file.path))),
 );
 
+gulp.task("npminstallv3", () =>
+  gulp
+    .src([
+      path.join(paths.extensions.tasks.scv3, "package.json"),
+      path.join(paths.commonv5.new, "package.json"),
+    ])
+    .pipe(es.mapSync((file) => npmInstallTask(file.path))),
+);
+
 gulp.task("npminstallv4", () =>
   gulp
     .src([
@@ -106,6 +115,21 @@ gulp.task("tasks:sonarcloud:v1:ts", () =>
       this.once("finish", () => process.exit(1));
     })
     .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
+    .pipe(gulp.dest(paths.build.extensions.root)),
+);
+
+gulp.task("tasks:sonarcloud:v3:ts", () =>
+  gulp
+    .src([
+      path.join(paths.extensions.tasks.scv3, "**", "*.ts"),
+      "!" + path.join("**", "node_modules", "**"),
+      "!" + path.join("**", "__tests__", "**"),
+    ])
+    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
+    .once("error", () => {
+      this.once("finish", () => process.exit(1));
+    })
+    .pipe(gulpReplace("../../../../../commonv5/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
@@ -151,6 +175,27 @@ gulp.task("tasks:sonarcloud:v1:commonv5:ts", () => {
       this.once("finish", () => process.exit(1));
     });
   globby.sync(paths.extensions.tasks.scv1, { nodir: false }).forEach((dir) => {
+    commonPipe = commonPipe.pipe(
+      gulp.dest(
+        path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
+      ),
+    );
+  });
+  return commonPipe;
+});
+
+gulp.task("tasks:sonarcloud:v3:commonv5:ts", () => {
+  let commonPipe = gulp
+    .src([
+      path.join(paths.commonv5.new, "**", "*.ts"),
+      "!" + path.join("**", "node_modules", "**"),
+      "!" + path.join("**", "__tests__", "**"),
+    ])
+    .pipe(gulpTs.createProject("./tsconfig.json", { typescript })())
+    .once("error", () => {
+      this.once("finish", () => process.exit(1));
+    });
+  globby.sync(paths.extensions.tasks.scv3, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
       gulp.dest(
         path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
@@ -211,6 +256,15 @@ gulp.task("tasks:sonarcloud:v1:copy", () =>
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
+gulp.task("tasks:sonarcloud:v3:copy", () =>
+  gulp
+    .src([
+      path.join(paths.extensions.tasks.scv3, "task.json"),
+      pathAllFiles(paths.extensions.tasks.scv3, "node_modules"),
+    ])
+    .pipe(gulp.dest(paths.build.extensions.root)),
+);
+
 gulp.task("tasks:v4:copy", () =>
   gulp
     .src([
@@ -261,6 +315,22 @@ gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
   return commonPipe;
 });
 
+gulp.task("tasks:sonarcloud:v3:commonv5:copy", () => {
+  let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
+  globby.sync(paths.extensions.tasks.scv3, { nodir: false }).forEach((dir) => {
+    commonPipe = commonPipe.pipe(
+      gulp.dest(
+        path.join(
+          paths.build.extensions.root,
+          path.relative(paths.extensions.root, dir),
+          "node_modules",
+        ),
+      ),
+    );
+  });
+  return commonPipe;
+});
+
 gulp.task("tasks:v5:commonv5:copy", () => {
   let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
   globby.sync(paths.extensions.tasks.v5, { nodir: false }).forEach((dir) => {
@@ -296,6 +366,17 @@ gulp.task(
     "tasks:sonarcloud:v1:commonv5:ts",
     "tasks:sonarcloud:v1:copy",
     "tasks:sonarcloud:v1:commonv5:copy",
+  ),
+);
+
+gulp.task(
+  "tasks:sonarcloud:v3:bundle",
+  gulp.series(
+    "npminstallv3",
+    "tasks:sonarcloud:v3:ts",
+    "tasks:sonarcloud:v3:commonv5:ts",
+    "tasks:sonarcloud:v3:copy",
+    "tasks:sonarcloud:v3:commonv5:copy",
   ),
 );
 
@@ -390,6 +471,7 @@ gulp.task("scanner:extract-scanners", () => {
   // Extract CLI scanner to 'analyze' tasks
   const cliFolders = [
     path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
+    path.join(paths.build.extensions.codescancloudTasks, "analyze", "v3", "sonar-scanner"),
   ];
   let cliPipe = gulp.src(
       pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
@@ -407,6 +489,7 @@ gulp.task(
     "extension:copy",
     "tasks:old:bundle",
     "tasks:sonarcloud:v1:bundle",
+    "tasks:sonarcloud:v3:bundle",
     "tasks:v4:bundle",
     "tasks:v5:bundle",
     "tasks:copy-icons",
@@ -419,6 +502,7 @@ gulp.task(
 gulp.task("tfx", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) => tfxCommand(extension, packageJSON));
   done();
 });
@@ -433,6 +517,7 @@ gulp.task("build", gulp.series("clean", "copy", "tfx", "cycloneDx"));
 gulp.task("tfx:test", (done) => {
   globby
     .sync(path.join(paths.build.extensions.root, "*"), { nodir: false })
+    .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.json")))
     .forEach((extension) =>
       tfxCommand(extension, packageJSON, `--publisher ` + (yargs.argv.publisher || "codescansf")),
     );
@@ -441,32 +526,34 @@ gulp.task("tfx:test", (done) => {
 
 gulp.task("extension:test", () =>
   mergeStream(
-    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false }).map((extension) =>
-      mergeStream(
-        gulp
-          .src(path.join(extension, "extension-icon.test.png"))
-          .pipe(gulpRename("extension-icon.png"))
-          .pipe(
-            gulp.dest(
+    globby.sync(path.join(paths.extensions.root, "*"), { nodir: false })
+      .filter((extension) => fs.existsSync(path.join(extension, "vss-extension.test.json")))
+      .map((extension) =>
+        mergeStream(
+          gulp
+            .src(path.join(extension, "extension-icon.test.png"))
+            .pipe(gulpRename("extension-icon.png"))
+            .pipe(
+              gulp.dest(
+                path.join(
+                  paths.build.extensions.root,
+                  path.relative(paths.extensions.root, extension),
+                ),
+              ),
+            ),
+          gulp
+            .src(
               path.join(
                 paths.build.extensions.root,
                 path.relative(paths.extensions.root, extension),
+                "vss-extension.json",
               ),
-            ),
-          ),
-        gulp
-          .src(
-            path.join(
-              paths.build.extensions.root,
-              path.relative(paths.extensions.root, extension),
-              "vss-extension.json",
-            ),
-            { base: "./" },
-          )
-          .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
-          .pipe(gulp.dest("./")),
+              { base: "./" },
+            )
+            .pipe(jeditor(fs.readJsonSync(path.join(extension, "vss-extension.test.json"))))
+            .pipe(gulp.dest("./")),
+        ),
       ),
-    ),
   ),
 );
 

@@ -1,6 +1,7 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import fetch from "node-fetch";
 import * as semver from "semver";
+import { URL } from "url";
 import Endpoint from "../sonarqube/Endpoint";
 
 interface RequestData {
@@ -13,17 +14,28 @@ export async function get(
   isJson: boolean,
   query: RequestData = {},
 ): Promise<any> {
-  tl.debug(`[SQ] API GET: '${path}' with query "${JSON.stringify(query)}"`);
+  const fullUrl = new URL(path, endpoint.url);
+  for (const [key, value] of Object.entries(query)) {
+    if (value != null) {
+      fullUrl.searchParams.append(key, String(value));
+    }
+  }
+
+  if (fullUrl.origin !== new URL(endpoint.url).origin) {
+    throw new Error(
+      `URL origin mismatch: request targets ${fullUrl.origin} but endpoint is configured for ${new URL(endpoint.url).origin}`,
+    );
+  }
+
+  if (fullUrl.protocol === "http:") {
+    tl.warning("Insecure HTTP connection detected. Consider using HTTPS for secure communication.");
+  }
+
+  const fullUrlString = fullUrl.toString();
+  tl.debug(`[SQ] API GET: '${path}'`);
 
   try {
-    let url = endpoint.url + path;
-
-    Object.keys(query).forEach((key, i) => {
-      url += i === 0 ? "?" : "&";
-      url += `${key}=${query[key]}`;
-    });
-
-    const response = await fetch(url, endpoint.toFetchOptions(url));
+    const response = await fetch(fullUrlString, endpoint.toFetchOptions(fullUrlString));
 
     if (isJson) {
       return await response.json();
@@ -31,12 +43,8 @@ export async function get(
       return await response.text();
     }
   } catch (error) {
-    if (error.response) {
-      tl.debug(`[SQ] API GET '${path}' failed, status code was: ${error.response.status}`);
-    } else {
-      tl.debug(`[SQ] API GET '${path}' failed, error is ${error.message}`);
-    }
-    throw new Error(`[SQ] API GET '${path}' failed, error is ${error.message}`);
+    tl.debug(`[SQ] API GET '${path}' failed`);
+    throw new Error(`[SQ] API GET '${path}' failed`);
   }
 }
 

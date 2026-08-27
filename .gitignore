@@ -45,3 +45,12 @@ eslint-report.json
 
 # Custom scanners
 /*.zip
+
+# Secrets & credentials
+*.env
+.env.*
+*.pem
+*.key
+*.pfx
+.npmrc
+dist/

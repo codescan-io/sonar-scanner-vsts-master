@@ -5,7 +5,7 @@ import {
   TaskVariables,
 } from "./helpers/constants";
 import JavaVersionResolver from "./helpers/java-version-resolver";
-import { sanitizeScannerParams, stringifyScannerParams } from "./helpers/utils";
+import { sanitizeScannerParams, stringifyScannerParams, validateScannerMode, validateAndParseJson } from "./helpers/utils";
 import { EndpointType } from "./sonarqube/Endpoint";
 import Scanner, { ScannerMode } from "./sonarqube/Scanner";
 
@@ -30,16 +30,34 @@ export default async function analyzeTask(
     serverVersion,
   );
 
-  // Run scanner
-  const scannerMode: ScannerMode = ScannerMode[tl.getVariable(TaskVariables.SonarQubeScannerMode)];
+  // Run scanner - validate scanner mode
+  const scannerModeValue = tl.getVariable(TaskVariables.SonarQubeScannerMode);
+  const validatedMode = validateScannerMode(scannerModeValue);
+  const scannerMode: ScannerMode = ScannerMode[validatedMode];
   const scanner = Scanner.getAnalyzeScanner(rootPath, scannerMode);
-  const sqScannerParams = JSON.parse(tl.getVariable(TaskVariables.SonarQubeScannerParams));
+
+  let sqScannerParams;
+  try {
+    const paramsString = tl.getVariable(TaskVariables.SonarQubeScannerParams);
+    if (!paramsString) {
+      throw new Error("SonarQube scanner parameters are missing");
+    }
+    // Validate and parse JSON safely
+    sqScannerParams = validateAndParseJson(paramsString, "scanner parameters");
+  } catch (error) {
+    tl.setResult(tl.TaskResult.Failed, "Failed to parse scanner parameters. Verify the Prepare task completed successfully.");
+    return;
+  }
+
   await scanner.runAnalysis();
 
-  // Sanitize scanner params (SSF-194)
+  // Scrub credentials from SONARQUBE_SCANNER_PARAMS only AFTER the scanner
+  // has run — the spawned sonar-scanner inherits this env var and needs
+  // sonar.token / sonar.login present to authenticate.
+  const sanitizedParams = sanitizeScannerParams(sqScannerParams);
   tl.setVariable(
     TaskVariables.SonarQubeScannerParams,
-    stringifyScannerParams(sanitizeScannerParams(sqScannerParams)),
+    stringifyScannerParams(sanitizedParams),
   );
 
   JavaVersionResolver.revertJavaHomeToOriginal();

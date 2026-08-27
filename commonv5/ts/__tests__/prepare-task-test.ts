@@ -13,7 +13,7 @@ beforeEach(() => {
 
 describe("branchFeatureSupported", () => {
   it.each([
-    [new Endpoint(EndpointType.SonarCloud, { url: "https://sonarcloud.io" }), "SC", "1.2.3", true],
+    [new Endpoint(EndpointType.CodeScanCloud, { url: "https://sonarcloud.io" }), "SC", "1.2.3", true],
     [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "7.1.0", false],
     [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "9.9.0", true],
     [new Endpoint(EndpointType.SonarQube, { url: "https://localhost" }), "SQ", "10.0.0", true],

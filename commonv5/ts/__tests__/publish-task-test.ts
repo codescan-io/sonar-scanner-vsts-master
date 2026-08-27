@@ -54,7 +54,7 @@ const ANALYSIS_ERROR = new HtmlAnalysisReport(EndpointType.SonarQube, PROJECT_ST
   projectName: null,
 });
 
-const SC_ENDPOINT = new Endpoint(EndpointType.SonarCloud, { url: "https://endpoint.url" });
+const SC_ENDPOINT = new Endpoint(EndpointType.CodeScanCloud, { url: "https://endpoint.url" });
 const SQ_ENDPOINT = new Endpoint(EndpointType.SonarQube, { url: "https://endpoint.url" });
 const METRICS: Metric[] = [
   {
@@ -78,7 +78,7 @@ it("should fail unless SONARQUBE_SCANNER_PARAMS are supplied", async () => {
   jest.spyOn(tl, "getVariable").mockImplementation(() => undefined);
   jest.spyOn(tl, "setResult").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.getVariable).toHaveBeenCalledWith(TaskVariables.SonarQubeScannerParams);
   expect(tl.setResult).toHaveBeenCalledWith(
@@ -95,7 +95,7 @@ it("check multiple report status and set global quality gate for build propertie
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.CodeScanCloud,
     componentName: "componentName",
     warnings: [],
   });
@@ -139,7 +139,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: ok`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 2`);
@@ -154,7 +154,7 @@ it("check multiple report status and set global quality gate for build propertie
     analysisId: "123",
     componentKey: "key",
     status: "OK",
-    type: EndpointType.SonarCloud,
+    type: EndpointType.CodeScanCloud,
     componentName: "componentName",
     warnings: [],
   });
@@ -202,7 +202,7 @@ it("check multiple report status and set global quality gate for build propertie
 
   jest.spyOn(serverUtils, "publishBuildSummary").mockImplementation(() => null);
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(tl.debug).toHaveBeenCalledWith(`Overall Quality Gate status: failed`);
   expect(tl.debug).toHaveBeenCalledWith(`Number of analyses in this build: 3`);
@@ -336,13 +336,13 @@ it("task should not fail the task even if all ceTasks timeout", async () => {
       }),
   );
 
-  await publishTask.default(EndpointType.SonarCloud);
+  await publishTask.default(EndpointType.CodeScanCloud);
 
   expect(serverUtils.publishBuildSummary).toHaveBeenCalledTimes(1);
-  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.SonarCloud);
+  expect(publishSummaryMock.mock.calls[0][1]).toBe(EndpointType.CodeScanCloud);
   expect(tl.setResult).not.toHaveBeenCalledWith(tl.TaskResult.Failed);
 
-  expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.SonarCloud);
+  expect(serverUtils.publishBuildSummary).toHaveBeenCalledWith("\r\n", EndpointType.CodeScanCloud);
 
   expect(tl.warning).toHaveBeenCalledWith(
     "Task '111' takes too long to complete. Stopping after 1s of polling. No quality gate will be displayed on build result.",
@@ -439,9 +439,9 @@ describe("it should generate passing report correctly", () => {
     [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
     [EndpointType.SonarQube, SQ_ENDPOINT, {}, false],
     [EndpointType.SonarQube, SQ_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
-    [EndpointType.SonarCloud, SC_ENDPOINT, {}, false],
-    [EndpointType.SonarCloud, SC_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
+    [EndpointType.CodeScanCloud, SC_ENDPOINT, { "sonar.pullrequest.key": "123" }, true],
+    [EndpointType.CodeScanCloud, SC_ENDPOINT, {}, false],
+    [EndpointType.CodeScanCloud, SC_ENDPOINT, { "sonar.branch.name": "some-branch" }, false],
   ])(
     "should show issues fixed in pull request",
     async (endpointType, endpoint, scannerParams, shouldShow) => {

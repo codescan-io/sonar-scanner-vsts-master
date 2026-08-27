@@ -40,6 +40,11 @@ export default async function analyzeTask(
   }
   tl.setVariable("SONARQUBE_SCANNER_PARAMS", JSON.stringify(sqScannerParams));
   await scanner.runAnalysis();
+
+  // Scrub credentials from SONARQUBE_SCANNER_PARAMS only AFTER the scanner
+  // has run — the spawned sonar-scanner inherits this env var and needs
+  // sonar.token / sonar.login present to authenticate.
   tl.setVariable("SONARQUBE_SCANNER_PARAMS", sanitizeVariable(JSON.stringify(sqScannerParams)));
+
   JavaVersionResolver.revertJavaHomeToOriginal();
 }

@@ -26,7 +26,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.CodeScanCloud, null);
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -68,7 +68,7 @@ serverUrl=http://sonar`,
     },
   );
 
-  const endpoint = new Endpoint(EndpointType.SonarCloud, null);
+  const endpoint = new Endpoint(EndpointType.CodeScanCloud, null);
 
   const reports = await TaskReport.createTaskReportsFromFiles(
     endpoint,
@@ -88,9 +88,9 @@ it.each([
   [EndpointType.SonarQube, "7.2.0"],
   [EndpointType.SonarQube, "10.0.0"],
   [EndpointType.SonarQube, "20.0.0"],
-  [EndpointType.SonarCloud, "7.2.0"],
-  [EndpointType.SonarCloud, "10.0.0"],
-  [EndpointType.SonarCloud, "20.0.0"],
+  [EndpointType.CodeScanCloud, "7.2.0"],
+  [EndpointType.CodeScanCloud, "10.0.0"],
+  [EndpointType.CodeScanCloud, "20.0.0"],
 ])("should find report files for %p", (endpointType, version) => {
   // using spyOn so we can reset the original behaviour
   jest.spyOn(tl, "getHttpProxyConfiguration").mockReturnValue(null);

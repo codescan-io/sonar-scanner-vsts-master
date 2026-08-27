@@ -29,7 +29,7 @@ it("On SonarCloud password is always null", () => {
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
   jest.spyOn(tl, "getInput").mockImplementation(() => "organization");
 
-  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.SonarCloud);
+  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.CodeScanCloud);
 
   expect(result.toSonarProps("7.1.0")[PROP_NAMES.PASSSWORD]).toBeNull();
   expect(result.auth.password).toEqual("");
@@ -92,7 +92,7 @@ it("On SonarCloud token field is used instead of login", () => {
   jest.spyOn(tl, "getEndpointAuthorizationParameter").mockReturnValueOnce("");
   jest.spyOn(tl, "getInput").mockImplementation(() => "organization");
 
-  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.SonarCloud);
+  const result = Endpoint.getEndpoint("sonarcloud", EndpointType.CodeScanCloud);
 
   expect(result.toSonarProps("8.2.4")).not.toContain(PROP_NAMES.LOGIN);
 });
