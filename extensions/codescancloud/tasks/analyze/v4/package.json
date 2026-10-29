@@ -1,0 +1,27 @@
+{
+  "name": "analyze",
+  "version": "1.0.0",
+  "description": "CodeScan Cloud Task Prepare",
+  "author": "Village Chief",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "azure-devops-node-api": "12.1.0",
+    "azure-pipelines-task-lib": "5.281.2",
+    "fs-extra": "11.1.1",
+    "guid-typescript": "1.0.9",
+    "hpagent": "1.2.0",
+    "node-fetch": "2.7.0",
+    "semver": "5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "overrides": {
+    "follow-redirects": "1.16.2",
+    "minimatch": "3.1.5",
+    "underscore": "1.13.8",
+    "qs": "6.17.0",
+    "brace-expansion": "1.1.21",
+    "semver": "5.7.2"
+  }
+}
