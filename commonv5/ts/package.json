@@ -17,12 +17,12 @@
     "node": ">=18"
   },
   "overrides": {
-    "follow-redirects": "1.16.0",
+    "follow-redirects": "1.16.1",
     "minimatch": "3.1.5",
     "underscore": "1.13.8",
     "qs": "6.15.3",
     "brace-expansion": "1.1.18",
     "semver": "5.7.2",
-    "adm-zip": "0.6.0"
+    "adm-zip": "0.6.1"
   }
 }
