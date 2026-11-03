@@ -91,7 +91,7 @@ gulp.task("npminstallv3", () =>
 gulp.task("npminstallv4", () =>
   gulp
     .src([
-      path.join(paths.extensions.tasks.v4, "package.json"),
+      path.join(paths.extensions.tasks.scv4, "package.json"),
       path.join(paths.common.new, "package.json"),
     ])
     .pipe(es.mapSync((file) => npmInstallTask(file.path))),
@@ -133,10 +133,10 @@ gulp.task("tasks:sonarcloud:v3:ts", () =>
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
-gulp.task("tasks:v4:ts", () =>
+gulp.task("tasks:sonarcloud:v4:ts", () =>
   gulp
     .src([
-      path.join(paths.extensions.tasks.v4, "**", "*.ts"),
+      path.join(paths.extensions.tasks.scv4, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
       "!" + path.join("**", "__tests__", "**"),
     ])
@@ -144,7 +144,7 @@ gulp.task("tasks:v4:ts", () =>
     .once("error", () => {
       this.once("finish", () => process.exit(1));
     })
-    .pipe(gulpReplace("../../../../../common/ts/", "./common/"))
+    .pipe(gulpReplace("../../../../../commonv5/ts/", "./common/"))
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
@@ -205,10 +205,10 @@ gulp.task("tasks:sonarcloud:v3:commonv5:ts", () => {
   return commonPipe;
 });
 
-gulp.task("tasks:sonarqube:v4:common:ts", () => {
+gulp.task("tasks:sonarcloud:v4:commonv5:ts", () => {
   let commonPipe = gulp
     .src([
-      path.join(paths.common.new, "**", "*.ts"),
+      path.join(paths.commonv5.new, "**", "*.ts"),
       "!" + path.join("**", "node_modules", "**"),
       "!" + path.join("**", "__tests__", "**"),
     ])
@@ -216,7 +216,7 @@ gulp.task("tasks:sonarqube:v4:common:ts", () => {
     .once("error", () => {
       this.once("finish", () => process.exit(1));
     });
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
+  globby.sync(paths.extensions.tasks.scv4, { nodir: false }).forEach((dir) => {
     commonPipe = commonPipe.pipe(
       gulp.dest(
         path.join(paths.build.extensions.root, path.relative(paths.extensions.root, dir), "common"),
@@ -265,11 +265,13 @@ gulp.task("tasks:sonarcloud:v3:copy", () =>
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
 
-gulp.task("tasks:v4:copy", () =>
+// v4 tasks declare their own runtime dependencies (task-lib 5), so commonv5's
+// node_modules (task-lib 4) is deliberately not copied over them.
+gulp.task("tasks:sonarcloud:v4:copy", () =>
   gulp
     .src([
-      path.join(paths.extensions.tasks.v4, "task.json"),
-      pathAllFiles(paths.extensions.tasks.v4, "node_modules"),
+      path.join(paths.extensions.tasks.scv4, "task.json"),
+      pathAllFiles(paths.extensions.tasks.scv4, "node_modules"),
     ])
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
@@ -282,22 +284,6 @@ gulp.task("tasks:v5:copy", () =>
     ])
     .pipe(gulp.dest(paths.build.extensions.root)),
 );
-
-gulp.task("tasks:v4:common:copy", () => {
-  let commonPipe = gulp.src(pathAllFiles(paths.common.new, "node_modules"));
-  globby.sync(paths.extensions.tasks.v4, { nodir: false }).forEach((dir) => {
-    commonPipe = commonPipe.pipe(
-      gulp.dest(
-        path.join(
-          paths.build.extensions.root,
-          path.relative(paths.extensions.root, dir),
-          "node_modules",
-        ),
-      ),
-    );
-  });
-  return commonPipe;
-});
 
 gulp.task("tasks:sonarcloud:v1:commonv5:copy", () => {
   let commonPipe = gulp.src(pathAllFiles(paths.commonv5.new, "node_modules"));
@@ -381,13 +367,12 @@ gulp.task(
 );
 
 gulp.task(
-  "tasks:v4:bundle",
+  "tasks:sonarcloud:v4:bundle",
   gulp.series(
     "npminstallv4",
-    "tasks:v4:ts",
-    "tasks:sonarqube:v4:common:ts",
-    "tasks:v4:copy",
-    "tasks:v4:common:copy",
+    "tasks:sonarcloud:v4:ts",
+    "tasks:sonarcloud:v4:commonv5:ts",
+    "tasks:sonarcloud:v4:copy",
   ),
 );
 
@@ -472,6 +457,7 @@ gulp.task("scanner:extract-scanners", () => {
   const cliFolders = [
     path.join(paths.build.extensions.codescancloudTasks, "analyze", "v1", "sonar-scanner"),
     path.join(paths.build.extensions.codescancloudTasks, "analyze", "v3", "sonar-scanner"),
+    path.join(paths.build.extensions.codescancloudTasks, "analyze", "v4", "sonar-scanner"),
   ];
   let cliPipe = gulp.src(
       pathAllFiles(paths.build.classicScanner, `sonar-scanner-${scanner.cliVersion}`)
@@ -490,7 +476,7 @@ gulp.task(
     "tasks:old:bundle",
     "tasks:sonarcloud:v1:bundle",
     "tasks:sonarcloud:v3:bundle",
-    "tasks:v4:bundle",
+    "tasks:sonarcloud:v4:bundle",
     "tasks:v5:bundle",
     "tasks:copy-icons",
     "tasks:document-tasks-version",
